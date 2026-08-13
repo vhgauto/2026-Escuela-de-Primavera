@@ -1,0 +1,15 @@
+tp_clorofila/scripts/*
+tp_clorofila/.Rdata
+tp_clorofila/.Rhistory
+tp_clorofila/cloro*
+tp_clorofila/*.tif
+tp_machine_learning/*.R
+tp_prisma/*.zip
+tp_prisma/salida/*
+tp_prisma/*.R
+*.docx
+*.pdf
+*.html
+*.pptx
+.Rproj.user
+.vscode

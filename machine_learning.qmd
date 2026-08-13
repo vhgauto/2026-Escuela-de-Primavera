@@ -1,0 +1,196 @@
+---
+title: "<span style='font-size: 4em;'>Machine Learning</span>"
+abstract: Metodología para modelización mediante un mecanismo de aprendizaje automático con entrenamiento y validación de datos
+format: 
+  html:
+    embed-resources: true
+    number-sections: true
+    brand: true
+    fig-dpi: 300
+    toc: true
+    toc-title: Contenido
+    lang: es
+    language: 
+      title-block-author-plural: "Integrantes"
+    syntax-highlighting: kate
+    code-block-bg: "#f2f2f2"
+    code-link: true
+    code-copy: true
+    link-external-newwindow: true
+author: 
+  - name: Víctor Gauto
+    orcid: 0000-0001-9960-8558
+    corresponding: true
+    email: victor.gauto@outlook.com
+    affiliations:
+      - name: GISTAQ
+        url: https://www.instagram.com/gistaq.utn
+  - name: Anabella Ferral
+    affiliation: Instituto Gulich
+    orcid: 0000-0002-9383-7728
+  - name: Rocío Guido
+    affiliation: UNC
+    orcid: 0000-0002-7698-7927
+execute: 
+  echo: true
+  eval: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
+```
+
+Paquetes
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(finetune)
+tidymodels_prefer()
+```
+
+# Lectura de datos
+
+```{r}
+# d <- read_csv("Práctico_Machine_Learning/datos_reflect_cla.csv") |>
+#   filter(parametro == "cla_ciano") |>
+#   select(-parametro) |>
+#   pivot_wider(
+#     names_from = banda,
+#     values_from = reflect,
+#     id_cols = c(fecha, sitio, concentracion)
+#   ) |>
+#  rename(ciano = concentracion)
+# write_csv(d, "Práctico_Machine_Learning/datos_machine_learning.csv")
+
+d <- read_csv("Práctico_Machine_Learning/datos_machine_learning.csv") |>
+  select(ciano, starts_with("B")) |>
+  mutate(ndvi = (B5 - B4) / (B5 + B4)) |>
+  mutate(cociente = B2 / B5)
+```
+
+# División de datos
+
+```{r}
+set.seed(2000)
+datos_split <- initial_split(d, strata = ciano)
+datos_train <- training(datos_split)
+datos_test <- testing(datos_split)
+```
+
+# Entrenamiento
+
+Aplico bootstraps a los datos de entrenamiento.
+
+```{r}
+set.seed(2001)
+datos_bootstrap <- bootstraps(datos_train, strata = ciano)
+```
+
+# Recetas (preprocesamiento)
+
+```{r}
+bandas_rct <- recipe(
+  ciano ~ B1 + B2 + B3 + B4 + B5 + B6 + B7,
+  data = datos_train
+)
+ndvi_rct <- recipe(ciano ~ ndvi, data = datos_train)
+cociente_rct <- recipe(ciano ~ cociente, data = datos_train)
+suma_rct <- recipe(ciano ~ B3 + B4, data = datos_train)
+```
+
+# Especificación del modelo
+
+```{r}
+rf_spec <- rand_forest(trees = tune(), min_n = tune(), mtry = tune()) |>
+  set_engine("randomForest") |>
+  set_mode("regression")
+```
+
+# Workflow
+
+```{r}
+wf <- workflow_set(
+  preproc = list(
+    bandas = bandas_rct,
+    ndvi = ndvi_rct,
+    cociente = cociente_rct,
+    suma = suma_rct
+  ),
+  models = list(rf = rf_spec)
+)
+```
+
+Configuración.
+
+```{r}
+race_ctrl <- control_race(
+  save_pred = TRUE,
+  parallel_over = "everything",
+  save_workflow = TRUE
+)
+
+race_results <- wf |>
+  workflow_map(
+    "tune_race_anova",
+    seed = 2002,
+    resamples = datos_bootstrap,
+    grid = 50,
+    control = race_ctrl
+  )
+```
+
+# Resultados
+
+```{r}
+autoplot(
+  race_results,
+  rank_metric = "rmse",
+  metric = "rmse",
+  select_best = TRUE
+) +
+  geom_text(
+    aes(y = mean - 1 / 2, label = wflow_id),
+    angle = 90,
+    vjust = -.1,
+    size = 7
+  ) +
+  # scale_x_continuous(breaks = scales::breaks_width(1)) +
+  theme(legend.position = "none")
+
+race_results |>
+  rank_results() |>
+  pivot_wider(
+    names_from = .metric,
+    values_from = mean,
+    id_cols = c(wflow_id, .config, rank, model)
+  ) |>
+  slice_min(order_by = rmse, n = 1, by = model, with_ties = FALSE) |>
+  arrange(rmse)
+
+best_results <- race_results |>
+  extract_workflow_set_result("bandas_rf") |>
+  select_best(metric = "rmse")
+
+test_results <- race_results |>
+  extract_workflow("bandas_rf") |>
+  finalize_workflow(best_results) |>
+  last_fit(split = datos_split)
+```
+
+```{r}
+collect_metrics(test_results) # RMSE: 34.0, R2: 0.228
+
+collect_predictions(test_results) |>
+  ggplot(aes(x = ciano, y = .pred)) +
+  geom_abline(color = "gray50", lty = 2) +
+  geom_point(alpha = 0.5) +
+  coord_obs_pred(expand = TRUE) +
+  labs(x = "observed", y = "predicted") +
+  ggthemes::theme_few() +
+  theme_sub_panel(grid.major = element_line(linewidth = .1))
+```
+
