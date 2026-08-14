@@ -13,3 +13,4 @@ tp_prisma/*.R
 *.pptx
 .Rproj.user
 .vscode
+renv/
