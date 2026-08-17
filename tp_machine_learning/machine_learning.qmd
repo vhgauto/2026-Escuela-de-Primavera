@@ -1,0 +1,240 @@
+---
+title: "<span style='font-size: 4em;'>Machine Learning</span>"
+abstract: Metodología para modelización mediante un mecanismo de aprendizaje automático con entrenamiento y validación de datos
+format: 
+  html:
+    embed-resources: true
+    number-sections: true
+    brand: true
+    fig-dpi: 300
+    toc: true
+    toc-title: Contenido
+    lang: es
+    language: 
+      title-block-author-plural: "Integrantes"
+    syntax-highlighting: kate
+    code-block-bg: "#f2f2f2"
+    code-link: true
+    code-copy: true
+    link-external-newwindow: true
+author: 
+  - name: Víctor Gauto
+    orcid: 0000-0001-9960-8558
+    corresponding: true
+    email: victor.gauto@outlook.com
+    affiliations:
+      - name: GISTAQ
+        url: https://www.instagram.com/gistaq.utn
+  - name: Anabella Ferral
+    affiliation: Instituto Gulich
+    orcid: 0000-0002-9383-7728
+  - name: Rocío Guido
+    affiliation: UNC
+    orcid: 0000-0002-7698-7927
+execute: 
+  echo: true
+  eval: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
+```
+
+# El Área de Estudio y la Importancia de la Chl-a {.unnumbered}
+
+El Embalse San Roque es un cuerpo de agua emblemático de la provincia de Córdoba. Constituye la principal fuente de abastecimiento de agua potable para aproximadamente el 70% de la población de la ciudad de Córdoba y áreas aledañas, además de ser un nodo clave para la recreación y el turismo regional. Su deterioro ambiental, caracterizado por recurrentes floraciones algales y de cianobacterias, motivó un histórico fallo judicial que instó a la Provincia y a los municipios de la cuenca a implementar un plan de saneamiento obligatorio para mitigar la eutrofización del embalse. 
+La Clorofila-a (Chl-a) es el principal pigmento fotosintético del fitoplancton y actúa como un indicador clave del estado trófico y de la calidad del agua. Monitorear su concentración permite detectar procesos de eutrofización y blooms algales. La teledetección satelital complementa los muestreos de campo tradicionales, permitiendo generar mapas continuos de Chl-a sobre todo el embalse y sentar las bases para análisis de series temporales pasadas y modelos predictivos prospectivos.
+
+## Objetivo del Práctico {.unnumbered}
+
+El objetivo principal de este práctico es desarrollar, evaluar y comparar modelos para estimar la concentración de Clorofila-a en el Embalse San Roque, integrando datos de reflectancia espectral de los satélites Landsat 8/9 con mediciones de campo in situ. Al finalizar la sesión, obtendrás un algoritmo validado capaz de generar un mapa espacial continuo del estado trófico sobre la totalidad del cuerpo de agua.
+
+# Datos de Insumo y Preprocesamiento {.unnumbered}
+
+En este práctico integraremos dos fuentes de datos principales:
+
+- Mediciones in situ: Mediciones de Chl-a (en μg/L) obtenidas en campo mediante una sonda fluorométrica, registradas con su ubicación geográfica y fecha.
+- Datos Satelitales: Datos de reflectancia de superficie de los sensores OLI/OLI-2 a bordo de las misiones Landsat 8 y 9.
+
+El flujo de trabajo comienza con una etapa de limpieza y preparación de datos: procesaremos la tabla .csv de campo, reescalaremos las bandas espectrales a reflectancia de superficie y extraemos los valores espectrales exactos coincidentes con las coordenadas del vector de puntos de monitoreo.
+
+# Estrategia de Modelado: Entrenamiento, Validación y Bootstrapping {.unnumbered}
+
+Para garantizar la solidez estadística del modelo, dividiremos la base de datos en dos subconjuntos independientes: Entrenamiento (75%) y Validación (25%). Esta separación es fundamental: evaluar el algoritmo con un conjunto de datos "ciego" es la única forma objetiva de medir su verdadera capacidad de generalización y evitar el sobreajuste, donde el modelo memoriza el ruido local pero falla al predecir en nuevas escenas satelitales.
+
+Frente a las limitaciones logísticas, climáticas y económicas que restringen la frecuencia de los monitoreos in situ, aplicaremos la técnica de Bootstrapping sobre el conjunto de entrenamiento. Mediante la generación de múltiples submuestras con reemplazo que conservan la distribución estadística original, esta metodología amplía la representatividad de la base de datos, incrementa la estabilidad del algoritmo y mitiga la sensibilidad frente a valores atípicos (outliers).
+
+# Dos Enfoques Metodológicos: Tradicional vs. Machine Learning {.unnumbered}
+
+En este práctico evaluaremos y compararemos dos filosofías de modelado:
+
+- Enfoque Tradicional (Modelos Semiempíricos): Seleccionaremos combinaciones e índices de bandas que posean un sentido físico y bio-óptico claro (basados en las zonas de absorción y dispersión de la Chl-a en el espectro óptico) ajustados mediante regresiones lineales simples o múltiples.
+- Aprendizaje Automático (Machine Learning - Random Forest): Las técnicas de ML han cobrado gran relevancia por su capacidad para caracterizar aguas ópticamente complejas. Utilizaremos Random Forest (RF), un algoritmo de ensamble de árboles de decisión capaz de capturar relaciones no lineales complejas sin asumir distribuciones previas. RF minimiza el overfitting mediante selección aleatoria de variables y muestras, aportando además una métrica interna de importancia de los predictores para su interpretación.
+
+# Hoja de Ruta de la Práctica {.unnumbered}
+
+A lo largo de este script, avanzaremos paso a paso a través de las siguientes etapas:
+
+1. Preprocesamiento: Lectura de datos in situ, limpieza, reescalado de bandas de Landsat 8/9 y extracción de valores espectrales.
+2. Partición de Datos: Creación de los conjuntos de entrenamiento (75%) y validación (25%).
+3. Re-muestreo: Aplicación de Bootstrapping sobre el conjunto de entrenamiento para otorgar estabilidad estadística.
+4. Construcción de Modelos:
+  - Ajuste de modelos tradicionales (regresiones lineales simples e índices bio-ópticos).
+  - Entrenado y optimización de Random Forest mediante el ecosistema tidymodels.
+5. Evaluación e Interpretación: Comparación de métricas de desempeño (R2, RMSE) en el conjunto de validación y análisis de importancia de variables.
+6. Mapeo Espacial: Aplicación del modelo seleccionado sobre la escena satelital para generar el mapa final de Clorofila-a en el Embalse San Roque.
+
+Paquetes
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(finetune)
+tidymodels_prefer()
+```
+
+# Lectura de datos
+
+```{r}
+# d <- read_csv("Práctico_Machine_Learning/datos_reflect_cla.csv") |>
+#   filter(parametro == "cla_ciano") |>
+#   select(-parametro) |>
+#   pivot_wider(
+#     names_from = banda,
+#     values_from = reflect,
+#     id_cols = c(fecha, sitio, concentracion)
+#   ) |>
+#  rename(ciano = concentracion)
+# write_csv(d, "Práctico_Machine_Learning/datos_machine_learning.csv")
+
+d <- read_csv("Práctico_Machine_Learning/datos_machine_learning.csv") |>
+  select(ciano, starts_with("B")) |>
+  mutate(ndvi = (B5 - B4) / (B5 + B4)) |>
+  mutate(cociente = B2 / B5)
+```
+
+# División de datos
+
+```{r}
+set.seed(2000)
+datos_split <- initial_split(d, strata = ciano)
+datos_train <- training(datos_split)
+datos_test <- testing(datos_split)
+```
+
+# Entrenamiento
+
+Aplico bootstraps a los datos de entrenamiento.
+
+```{r}
+set.seed(2001)
+datos_bootstrap <- bootstraps(datos_train, strata = ciano)
+```
+
+# Recetas (preprocesamiento)
+
+```{r}
+bandas_rct <- recipe(
+  ciano ~ B1 + B2 + B3 + B4 + B5 + B6 + B7,
+  data = datos_train
+)
+ndvi_rct <- recipe(ciano ~ ndvi, data = datos_train)
+cociente_rct <- recipe(ciano ~ cociente, data = datos_train)
+suma_rct <- recipe(ciano ~ B3 + B4, data = datos_train)
+```
+
+# Especificación del modelo
+
+```{r}
+rf_spec <- rand_forest(trees = tune(), min_n = tune(), mtry = tune()) |>
+  set_engine("randomForest") |>
+  set_mode("regression")
+```
+
+# Workflow
+
+```{r}
+wf <- workflow_set(
+  preproc = list(
+    bandas = bandas_rct,
+    ndvi = ndvi_rct,
+    cociente = cociente_rct,
+    suma = suma_rct
+  ),
+  models = list(rf = rf_spec)
+)
+```
+
+Configuración.
+
+```{r}
+race_ctrl <- control_race(
+  save_pred = TRUE,
+  parallel_over = "everything",
+  save_workflow = TRUE
+)
+
+race_results <- wf |>
+  workflow_map(
+    "tune_race_anova",
+    seed = 2002,
+    resamples = datos_bootstrap,
+    grid = 50,
+    control = race_ctrl
+  )
+```
+
+# Resultados
+
+```{r}
+autoplot(
+  race_results,
+  rank_metric = "rmse",
+  metric = "rmse",
+  select_best = TRUE
+) +
+  geom_text(
+    aes(y = mean - 1 / 2, label = wflow_id),
+    angle = 90,
+    vjust = -.1,
+    size = 7
+  ) +
+  # scale_x_continuous(breaks = scales::breaks_width(1)) +
+  theme(legend.position = "none")
+
+race_results |>
+  rank_results() |>
+  pivot_wider(
+    names_from = .metric,
+    values_from = mean,
+    id_cols = c(wflow_id, .config, rank, model)
+  ) |>
+  slice_min(order_by = rmse, n = 1, by = model, with_ties = FALSE) |>
+  arrange(rmse)
+
+best_results <- race_results |>
+  extract_workflow_set_result("bandas_rf") |>
+  select_best(metric = "rmse")
+
+test_results <- race_results |>
+  extract_workflow("bandas_rf") |>
+  finalize_workflow(best_results) |>
+  last_fit(split = datos_split)
+```
+
+```{r}
+collect_metrics(test_results) # RMSE: 34.0, R2: 0.228
+
+collect_predictions(test_results) |>
+  ggplot(aes(x = ciano, y = .pred)) +
+  geom_abline(color = "gray50", lty = 2) +
+  geom_point(alpha = 0.5) +
+  coord_obs_pred(expand = TRUE) +
+  labs(x = "observed", y = "predicted") +
+  ggthemes::theme_few() +
+  theme_sub_panel(grid.major = element_line(linewidth = .1))
+```
+
