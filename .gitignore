@@ -11,6 +11,7 @@ tp_prisma/*.R
 *.pdf
 *.html
 *.pptx
+*.X
 .Rproj.user
 .vscode
 renv/
