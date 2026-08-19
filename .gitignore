@@ -3,10 +3,14 @@ tp_clorofila/.Rdata
 tp_clorofila/.Rhistory
 tp_clorofila/cloro*
 tp_clorofila/*.tif
+tp_clorofila/s2
+fig*
+postal*
 tp_machine_learning/*.R
 tp_prisma/*.zip
 tp_prisma/salida/*
 !tp_prisma/salida/recorte.tif
+!tp_prisma/salida/PRS_L2D_STD_20220311142257_20220311142301_0001_HCO_FULL.wvl
 tp_prisma/*.he5
 tp_prisma/*.R
 *.docx
