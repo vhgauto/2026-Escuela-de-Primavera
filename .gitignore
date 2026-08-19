@@ -6,6 +6,8 @@ tp_clorofila/*.tif
 tp_machine_learning/*.R
 tp_prisma/*.zip
 tp_prisma/salida/*
+!tp_prisma/salida/recorte.tif
+tp_prisma/*.he5
 tp_prisma/*.R
 *.docx
 *.pdf
