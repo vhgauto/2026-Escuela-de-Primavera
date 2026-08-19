@@ -64,15 +64,15 @@ El producto PRISMA, nivel de procesamiento L2D del 2022-03-11, se extrae y convi
 ```{r}
 #| eval: false
 unzip(
-  "Práctico_PRISMA/PRS_L2D_STD_20220311142257_20220311142301_0001.zip",
-  exdir = "Práctico_PRISMA/"
+  "tp_prisma/PRS_L2D_STD_20220311142257_20220311142301_0001.zip",
+  exdir = "tp_prisma/"
 )
 
 prismaread::pr_convert(
-  in_file = "Práctico_PRISMA/PRS_L2D_STD_20220311142257_20220311142301_0001.he5",
-  out_folder = "Práctico_PRISMA/salida/",
+  in_file = "tp_prisma/PRS_L2D_STD_20220311142257_20220311142301_0001.he5",
+  out_folder = "tp_prisma/salida/",
   out_format = "GTiff",
-  FULL = TRUE
+  VNIR = TRUE
 )
 ```
 
@@ -133,7 +133,7 @@ A partir de los sitios de interés, se extraen las firmas espectrales del produc
 #| column: body-outset
 
 wvl <- read_delim(
-  "Práctico_PRISMA/salida/PRS_L2D_STD_20220311142257_20220311142301_0001_HCO_FULL.wvl",
+  "tp_prisma/salida/PRS_L2D_STD_20220311142257_20220311142301_0001_HCO_FULL.wvl",
   delim = " ",
   show_col_types = FALSE
 ) |>
@@ -153,7 +153,7 @@ reflect_tbl <- terra::extract(r, p, bind = TRUE) |>
 
 ggplot(reflect_tbl, aes(wl, reflect, group = puntos, color = puntos)) +
   geom_line(linewidth = .5) +
-  scale_x_continuous(breaks = scales::breaks_width(250)) +
+  scale_x_continuous(breaks = scales::breaks_width(100)) +
   scale_color_brewer(palette = "Dark2") +
   labs(x = "Long. de onda (nm)", y = "Reflect", color = NULL) +
   theme_minimal() +
@@ -181,8 +181,9 @@ A partir de las firmas espectrales de referencia, se obtiene el **Spectral Angle
 #| fig-cap-location: margin
 #| label: fig-sam-ang
 endmembers <- terra::extract(r, p)
+r_vnir <- r[[1:63]]
 
-lago_sam_ang <- RStoolbox::sam(r, endmembers, angles = TRUE)
+lago_sam_ang <- RStoolbox::sam(r_vnir, endmembers, angles = TRUE)
 
 ggplot() +
   geom_spatraster_rgb(
@@ -206,7 +207,7 @@ Es posible obtener la clasificación de acuerdo con el aporte principal de cada 
 #| fig-cap-location: margin
 #| label: fig-sam-clas
 sitios <- c("Urbano", "Agua", "Vegetación")
-lago_sam_clas <- RStoolbox::sam(r, endmembers, angles = FALSE)
+lago_sam_clas <- RStoolbox::sam(r_vnir, endmembers, angles = FALSE)
 
 ggplot() +
   geom_spatraster(data = lago_sam_clas) +
@@ -247,12 +248,13 @@ f_mascara <- function(X) {
   rz <- zonal(cellSize(p, unit = "m"), p, sum, as.raster = TRUE)
   m <- global(rz, "max", na.rm = TRUE)$max
   s <- ifel(rz < m, NA, y)
-  return(s)
+  h <- fillHoles(s)
+  return(h)
 }
 
 m <- f_mascara(mndwi)
 
-agua <- crop(r, m, mask = TRUE)
+agua <- crop(r_vnir, m, mask = TRUE)
 
 pca_agua3 <- RStoolbox::rasterPCA(
   agua,
