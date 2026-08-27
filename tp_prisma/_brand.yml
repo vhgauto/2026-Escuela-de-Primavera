@@ -1,0 +1,29 @@
+color:
+  palette:
+    negro: "#000000"
+    gris-claro: "#fafafa"
+    violeta: "#483d7d"
+    purpura: "#b86092"
+  background: gris-claro
+  foreground: negro
+  primary: black
+
+# logo: 
+#   medium: logo.png
+
+typography:
+  fonts:
+    - family: Fira Code
+      source: google
+    - family: Gelasio
+      source: google
+    - family: Lato
+      source: google
+  base: Lato
+  headings:
+    family: Gelasio
+    color: violeta
+    weight: 700
+  monospace: Fira Code
+  link:
+    color: purpura
