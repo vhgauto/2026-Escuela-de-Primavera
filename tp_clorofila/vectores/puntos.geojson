@@ -1,15 +1,15 @@
 {
 "type": "FeatureCollection",
 "name": "puntos",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32620" } },
 "features": [
-{ "type": "Feature", "properties": { "sitio": "SAT4" }, "geometry": { "type": "Point", "coordinates": [ -7176412.168254331685603, -3677338.267322117928416 ] } },
-{ "type": "Feature", "properties": { "sitio": "GAR" }, "geometry": { "type": "Point", "coordinates": [ -7173322.989850926212966, -3681293.911479947157204 ] } },
-{ "type": "Feature", "properties": { "sitio": "ZA" }, "geometry": { "type": "Point", "coordinates": [ -7175308.42778395395726, -3680999.488898611627519 ] } },
-{ "type": "Feature", "properties": { "sitio": "SAT2" }, "geometry": { "type": "Point", "coordinates": [ -7177509.929295440204442, -3682359.644328890834004 ] } },
-{ "type": "Feature", "properties": { "sitio": "ZB" }, "geometry": { "type": "Point", "coordinates": [ -7175123.689966103993356, -3681708.943261647596955 ] } },
-{ "type": "Feature", "properties": { "sitio": "SAT3" }, "geometry": { "type": "Point", "coordinates": [ -7176874.803323128260672, -3679199.253478723578155 ] } },
-{ "type": "Feature", "properties": { "sitio": "SAT1" }, "geometry": { "type": "Point", "coordinates": [ -7178453.332419468089938, -3683956.134070318657905 ] } },
-{ "type": "Feature", "properties": { "sitio": "CEN" }, "geometry": { "type": "Point", "coordinates": [ -7176697.117019452154636, -3681444.132267404347658 ] } }
+{ "type": "Feature", "properties": { "sitio": "SAT4" }, "geometry": { "type": "Point", "coordinates": [ 360465.938202563789673, -3468514.064767939969897 ] } },
+{ "type": "Feature", "properties": { "sitio": "GAR" }, "geometry": { "type": "Point", "coordinates": [ 363150.0163678197423, -3471842.766166476532817 ] } },
+{ "type": "Feature", "properties": { "sitio": "ZA" }, "geometry": { "type": "Point", "coordinates": [ 361450.432671962538734, -3471614.773231666069478 ] } },
+{ "type": "Feature", "properties": { "sitio": "SAT2" }, "geometry": { "type": "Point", "coordinates": [ 359585.035932608996518, -3472796.191166589967906 ] } },
+{ "type": "Feature", "properties": { "sitio": "ZB" }, "geometry": { "type": "Point", "coordinates": [ 361616.245715467841364, -3472215.84551434405148 ] } },
+{ "type": "Feature", "properties": { "sitio": "SAT3" }, "geometry": { "type": "Point", "coordinates": [ 360091.697333642980084, -3470101.901567082852125 ] } },
+{ "type": "Feature", "properties": { "sitio": "SAT1" }, "geometry": { "type": "Point", "coordinates": [ 358797.423975997022353, -3474164.148775452747941 ] } },
+{ "type": "Feature", "properties": { "sitio": "CEN" }, "geometry": { "type": "Point", "coordinates": [ 360269.014737043413334, -3472008.57920997031033 ] } }
 ]
 }
