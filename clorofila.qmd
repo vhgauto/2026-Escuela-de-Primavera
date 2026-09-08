@@ -1,5 +1,7 @@
 ---
-title: "<b>Hands-on: Semi-empirical Algorithms and Water Quality Indicator Modelling</b>"
+title: "<b style='font-size: 2em;'>Hands-on: Semi-empirical Algorithms and Water Quality Indicator Modelling</b>"
+subtitle: Escuela de Primavera 2026 - Instituto Gulich
+date: 2026-09-21
 abstract: Modelización de clorofila-a en el Lago San Roque a partir de muestreos de campo y productos Landsat 8
 format: 
   html:
@@ -40,19 +42,23 @@ author:
 execute: 
   echo: true
   eval: true
+nocite: |
+  @*
 editor_options: 
   chunk_output_type: console
 ---
 
 <!-- lin: cociente de bandas
 
-receta_bandas + ndvi
+caption en fig/tablas
 
-clo y log(clo)
+patchwork en mapa final
 
-clo_tbl + log(clo)
+métricas finales
 
-agregar referencias
+Embalse San Roque
+
+engine latex
 
 PRISMA: 2000-2500 p/SAM -->
 
@@ -61,11 +67,77 @@ PRISMA: 2000-2500 p/SAM -->
 knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
 ```
 
-# Introducción {.unnumbered}
+<!-- # Introducción {.unnumbered}
 
 La estimación de parámetros del agua (turbidez, clorofila-a, profundidad de disco, etc) es posible mediante técnicas de teledetección. Se combinan las reflectancias de superficie (obtenidas por plataformas satelitales) con mediciones de propiedades de interés (mediante muestreos de campo) para dar paso a la modelización, obteniendo un algoritmo.
 
-El área de estudio es el Lago San Roque y el producto satelital proviene de Landsat 8 para la fecha 2017-02-22.
+El área de estudio es el Lago San Roque y el producto satelital proviene de Landsat 8 para la fecha 2017-02-22. -->
+
+# El Área de Estudio y la Importancia de la Clorofila-a {.unnumbered}
+
+El Embalse San Roque es un cuerpo de agua emblemático de la provincia de Córdoba. Constituye la principal fuente de abastecimiento de agua potable para aproximadamente el 70% de la población de la ciudad de Córdoba y áreas aledañas, es decir, más de 1,5 millones de habitantes, además de ser un nodo clave para la recreación y el turismo regional. Su estado ambiental, caracterizado por recurrentes floraciones algales y de cianobacterias, motivó un histórico fallo judicial para la implementación de un plan de saneamiento con el fin de mitigar la eutrofización del embalse gestionado por la Provincia y los municipios de la cuenca.
+
+La Clorofila-a (`cla`) es el principal pigmento fotosintético del fitoplancton y actúa como un indicador clave del estado trófico y de la calidad del agua. Monitorear su concentración permite detectar procesos de eutrofización y blooms algales. La teledetección satelital complementa los muestreos de campo tradicionales, permitiendo generar mapas continuos de `cla` sobre todo el embalse y sentar las bases para análisis de series temporales y modelos predictivos de regresión.
+
+## Objetivo del Práctico {.unnumbered}
+
+El objetivo principal de este práctico es proponer, entrenar, comparar, seleccionar y validar modelos para estimar la concentración de Clorofila-a en el Embalse San Roque, integrando datos de reflectancia espectral de los satélites Landsat 8/9 con mediciones de campo in situ. Al finalizar la sesión, obtendrás un algoritmo validado capaz de generar un mapa de distribución espacial de concentración de Clorofila-a sobre la totalidad del cuerpo de agua.
+
+# Datos de Insumo y Preprocesamiento {.unnumbered}
+
+En este práctico integraremos dos fuentes de datos principales:
+
+- Mediciones in situ: Mediciones de `cla` (en μg/L) obtenidas en campo mediante una sonda fluorométrica, registradas con su ubicación geográfica y fecha.
+
+- Datos Satelitales: Datos de reflectancia de superficie (L2) de los sensores OLI/OLI-2 a bordo de las misiones Landsat 8 y 9, corregidas atmosféricamente, de acceso libre y gratuito en [https://earthexplorer.usgs.gov/](https://earthexplorer.usgs.gov/).
+
+Flujo de trabajo, lectura y extracción de datos: se extraen los valores de píxel de los ráster en reflectancia de superficie^[Los valores de píxel del producto satelital ($DN$) deben ser rescalados considerando los factores multiplicativo $2.75e-5$ y aditivo $-0.2$, restultando: $reflect=DN*2.75e^{-5}-0.2$] mediante un vector de puntos, conteniendo las coordenadas de los sitios de muestreo fijos. Las reflectancias se combinan con los datos de clorofila, por fecha y sitio, contenidos en un archivo de texto (`.csv`), obteniendo una tabla final con datos de `cla` y reflectancias de cada banda espectral como insumo para la modelización.
+
+<!-- El flujo de trabajo comienza con una etapa de limpieza y preparación de datos: procesaremos la tabla .csv de campo, reescalaremos las bandas espectrales a reflectancia de superficie y extraemos los valores espectrales exactos coincidentes con las coordenadas del vector de puntos de monitoreo. -->
+
+# Estrategia de Modelado: Entrenamiento, Validación y Bootstrapping {.unnumbered}
+
+En este práctico, la variable de interés a ser estimada es la clorofila-a (`cla`), tomando las bandas espectrales (`B1` a `B7`) e índices creados a partir de combinaciones entre las mismas, como variables explicativas.
+
+Para contribuir a la robustez estadística del modelo, dividiremos aleatoriamente la base de datos en dos subconjuntos diferentes: Entrenamiento (75%) y Validación (25%). Esta separación es fundamental: validar el algoritmo con un conjunto de datos independiente es la única forma objetiva de medir su verdadera capacidad de generalización y, en el caso de los modelos de machine learning, evitar el sobreajuste, donde el modelo memoriza el ruido local pero falla al estimar la variable de interés con nuevos datos.
+
+Frente a las limitaciones logísticas, climáticas y económicas que restringen la frecuencia de los monitoreos in situ, aplicaremos la técnica de Bootstrapping sobre el conjunto de entrenamiento. Mediante la generación de múltiples submuestras con reemplazo que conservan la distribución estadística original, esta metodología amplía la representatividad de la base de datos, incrementa la estabilidad del algoritmo y mitiga la sensibilidad frente a valores atípicos (outliers).
+
+# Dos Enfoques Metodológicos: Tradicional vs. Machine Learning {.unnumbered}
+
+En este práctico evaluaremos y compararemos dos métodos de modelado:
+
+- Enfoque Tradicional (Modelos Semiempíricos): Seleccionaremos combinaciones e índices de bandas que posean un sentido físico y bio-óptico claro, basados en las regiones de absorción y dispersión de la clorofila-a en el espectro electromagnético, ajustados mediante regresiones lineales simples o múltiples.
+
+- Aprendizaje Automático (Machine Learning): Las técnicas de ML han cobrado gran relevancia por su capacidad para caracterizar aguas ópticamente complejas. Utilizaremos **Random Forest** (RF), un algoritmo de ensamble de árboles de decisión capaz de capturar relaciones no lineales complejas sin asumir distribuciones previas. RF minimiza el sobreajuste mediante una selección aleatoria de variables y muestras. Además, se pueden aplicar técnicas que nos ayudan a interpretar un modelo ML a partir del grado de participación de las variables predictoras.
+
+# Hoja de Ruta de la Práctica {.unnumbered}
+
+A lo largo de esta clase, avanzaremos paso a paso a través de las siguientes etapas:
+
+[-@sec-prepro] hola
+
+1. [@sec-prepro] : Lectura de los ráster, extracción de los valores de reflectancia en los sitios de interés, lectura de datos in situ de `cla` y su combinación en una única tabla de datos.
+2. Correlaciones: Cálculo del coeficiente de correlación lineal de Pearson (`r`) entre `cla` y las bandas espectrales e índices.
+3. División de Datos: Creación de los conjuntos de entrenamiento (75%) y validación (25%).
+4. Re-muestreo: Aplicación de Bootstrapping sobre el conjunto de entrenamiento para otorgar estabilidad estadística.
+5. Construcción de Modelos:
+    1. Mecanismos de los modelos, donde se definen el modelo lineal y el RF.
+    2. Recetas, que relacionan `cla` con las variables explicativas.
+    3. Workflow, para unir recetas y modelos.
+6. Entrenamiento, con la optimización del número de árboles (`trees`) y entrenar los modelos propuestos.
+7. Selección del modelo, comparación entre las métricas de desempeño de los algoritmos entrenados.
+8. Validación, último ajuste del modelo elegido con los datos de validación, cálculo de las métricas de desempeño finales y la comparación entre datos medidos y estimados.
+9. Mapa, aplicación del algoritmo desarrollado a un recorte del Embalse San Roque.
+10. Explicabilidad de RF, aplicación del método de importancia global de variables.
+
+
+  <!-- Ajuste de modelos tradicionales (regresiones lineales simples e índices bio-ópticos). -->
+  <!-- - Entrenado y optimización de Random Forest mediante el ecosistema tidymodels. -->
+<!-- 5. Evaluación e Interpretación: Comparación de métricas de desempeño (R2, RMSE) en el conjunto de validación y análisis de importancia de variables.
+6. Mapeo Espacial: Aplicación del modelo seleccionado sobre la escena satelital para generar el mapa final de Clorofila-a en el Embalse San Roque. -->
+
+# Preprocesamiento {#sec-prepro}
 
 Los paquetes requeridos son `{terra}` para el procesamiento de datos espaciales (rásters y vectores) y `{tidyverse}` para el procesamiento general de datos. El paquete `{tidyterra}` nos es útil para la confección de mapas.
 
@@ -78,7 +150,6 @@ library(tidymodels)
 library(tidyverse)
 tidymodels_prefer()
 ```
-# Preprocesamiento
 
 Se leen los archivos ráster de acuerdo con las fechas seleccionadas.
 
@@ -109,7 +180,7 @@ r_fecha <- r2 |>
 
 ggplot() +
   geom_spatraster_rgb(
-    data = stretch(r2), r = 4, g = 3, b = 2, max_col_value = 150
+    data = stretch(r2), r = 4, g = 3, b = 2, stretch = "lin"
   ) +
   geom_spatvector(data = p, shape = 21, fill = "red", color = "gold") +
   geom_spatvector_label(
@@ -166,7 +237,7 @@ Los datos de clorofila-a provienen de un archivo de texto (`.csv`) que contiene 
 
 ```{r}
 #| warning: false
-clo_tbl <- read_csv("tp_clorofila/datos/clorofila.csv")
+cla_tbl <- read_csv("tp_clorofila/datos/clorofila.csv")
 ```
 
 ```{r}
@@ -174,7 +245,7 @@ clo_tbl <- read_csv("tp_clorofila/datos/clorofila.csv")
 #| label: tbl-clo
 #| tbl-cap: Datos de muestreo de clorofila-a por sitio.
 #| tbl-cap-location: margin
-gt::gt(head(clo_tbl, 10)) |>
+gt::gt(head(cla_tbl, 10)) |>
   gt::fmt_number(decimals = 1) |>
   gtExtras::gt_theme_538(
     quiet = TRUE,
@@ -183,17 +254,17 @@ gt::gt(head(clo_tbl, 10)) |>
   )
 ```
 
-Finalmente, se combinan los datos espectrales con las mediciones de clorofila-a, a partir del nombre del sitio y la fecha. Para la modelización se seleccionan únicamente las bandas y el valor de clorofila-a (`clo`).
+Finalmente, se combinan los datos espectrales con las mediciones de `cla`, a partir del nombre del sitio y la fecha. Para la modelización se seleccionan únicamente las bandas y el valor de `clo`.
 
 ```{r}
-reflect_clo <- reflect_tbl |>
-  inner_join(clo_tbl, by = join_by(fecha, sitio)) |>
-  select(clo, starts_with("B"))
+reflect_cla <- reflect_tbl |>
+  inner_join(cla_tbl, by = join_by(fecha, sitio)) |>
+  select(cla, starts_with("B"))
 ```
 
 ```{r}
 #| echo: false
-gt::gt(head(reflect_clo, 10)) |>
+gt::gt(head(reflect_cla, 10)) |>
   gt::fmt_number(decimals = 5, columns = starts_with("B")) |>
   gtExtras::gt_theme_538(
     quiet = TRUE,
@@ -213,47 +284,54 @@ $$
 Creo una nueva base de datos que contiene el `NDVI`.
 
 ```{r}
-d <- reflect_clo |>
+d <- reflect_cla |>
   mutate(
     ndvi = (B5 - B4) / (B5 + B4),
-    B5_B1 = B5/B1
+    B5_B1 = B5 / B1
   )
 ```
 
 A partir de los valores de reflectancia de superficie, asociados a las mediciones de clorofila-a, se puede calcular el coeficiente de correlación lineal (`r`) para cada variable.
 
 ```{r}
-#| tbl-cap: Coeficientes de correlación lineal entre clorofila-a y las bandas L8
-#| tbl-cap-location: margin
 #| label: tbl-corr
 #| eval: false
 pivot_longer(
   d,
-  cols = -clo,
+  cols = -cla,
   values_to = "reflect",
   names_to = "banda"
 ) |>
   nest(.by = banda) |>
-  mutate(r = map_dbl(data, ~ cor(.x$reflect, .x$clo))) |>
-  select(banda, r) |>
-  arrange(desc(r))
+  mutate(r = map_dbl(data, ~ cor(.x$reflect, .x$cla))) |>
+  mutate(pvalor = map(data, ~ cor.test(.x$reflect, .x$cla))) |>
+  mutate(pvalor = map_dbl(pvalor, ~tidy(.x)$p.value)) |> 
+  select(banda, r, pvalor) |>
+  arrange(desc(r)) |> 
+  mutate(es_signif = pvalor < .05)
 ```
 
 ```{r}
 #| echo: false
 #| eval: true
+#| tbl-cap: Coeficientes de correlación lineal entre clorofila-a y las bandas L8
+#| tbl-cap-location: margin
 pivot_longer(
   d,
-  cols = -clo,
+  cols = -cla,
   values_to = "reflect",
   names_to = "banda"
 ) |>
   nest(.by = banda) |>
-  mutate(r = map_dbl(data, ~ cor(.x$reflect, .x$clo))) |>
-  select(banda, r) |>
-  arrange(desc(r)) |>
+  mutate(r = map_dbl(data, ~ cor(.x$reflect, .x$cla))) |>
+  mutate(pvalor = map(data, ~ cor.test(.x$reflect, .x$cla))) |>
+  mutate(pvalor = map_dbl(pvalor, ~tidy(.x)$p.value)) |> 
+  select(banda, r, pvalor) |>
+  arrange(desc(r)) |> 
+  mutate(es_signif = pvalor < .05) |> 
   gt::gt() |>
-  gt::fmt_number(decimals = 3) |>
+  gt::fmt_number(decimals = 3, columns = "r") |>
+  gt::fmt_number(decimals = 6, columns = "pvalor") |>
   gtExtras::gt_theme_538(
     quiet = TRUE,
     row.striping.background_color = "#fafafa",
@@ -261,11 +339,9 @@ pivot_longer(
   )
 ```
 
-# Modelización
+# División de Datos
 
 A partir de los valores de $r$, se proponen diversos modelos para entrenar y seleccionar aquel que presente las mejores métricas de desempeño ($R^2$, $RMSE$) @tidymodels. Luego, ocurre la validación y se aplica el algoritmo desarrollado a un producto para verificar la distribución espacial de la clorofila-a.
-
-## División de datos
 
 Inicialmente, se dividen los datos en dos grupos: entrenamiento (75%) y validación (25%), respetando la distribución de la variable de salida (`clo`).
 
@@ -274,7 +350,7 @@ Dado que esta división es aleatoria, es relevante mantener la reproducibilidad 
 ```{r}
 #| warning: false
 set.seed(2000)
-datos_split <- initial_split(d, strata = clo)
+datos_split <- initial_split(d, strata = cla)
 datos_train <- training(datos_split)
 datos_test <- testing(datos_split)
 ```
@@ -284,14 +360,14 @@ datos_test <- testing(datos_split)
 datos_split
 ```
 
-## Remuestreo
+# Re-muestreo
 
 Aplico bootstraping @davisonBootstrapMethodsTheir1997 a los datos de entrenamiento, generando 25 nuevos conjuntos de entrenamiento/validación que incluyen repeticiones.
 
 ```{r}
 #| warning: false
 set.seed(2001)
-datos_bootstrap <- bootstraps(datos_train, strata = clo, times = 25)
+datos_bootstrap <- bootstraps(datos_train, strata = cla, times = 25)
 ```
 
 ```{r}
@@ -299,27 +375,11 @@ datos_bootstrap <- bootstraps(datos_train, strata = clo, times = 25)
 datos_bootstrap
 ```
 
-## Recetas
-
-Las recetas combinan la variable de interés (`clo`) con las variables explicativas permitiendo agregar etapas de modificación posteriores.
-
-Para los modelos lineales se consideran dos recetas para la regresión de `clo`: índice espectral NDVI y la banda B5.
-
-```{r}
-receta_ndvi <- recipe(clo ~ ndvi, data = d)
-receta_b5 <- recipe(clo ~ B5, data = d)
-```
-
-Para los modelos de *machine learning* se definen dos recetas: todas las bandas espectrales disponibles (de B1 a B7), y una selección de las mismas, descartando aquellas menos relevantes para el fenómeno de estudio (B3, B5).
-
-```{r}
-receta_bandas <- recipe(clo ~ B1 + B2 + B3 + B4 + B5 + B6 + B7, data = d)
-receta_select <- recipe(clo ~ B5 + B3, data = d)
-```
+# Construcción de Modelos
 
 ## Mecanismos de los modelos
 
-Se especifica la manera en la que se relacionan las variables, indicando el mecanismo de asociación del parámetro de salida (`clo`) y las variables explicativas.
+Se especifica la manera en la que se relacionan las variables, indicando el mecanismo de asociación del parámetro de salida `cla` y las variables explicativas.
 
 El modelos lineal utilizado para la regresión empleando la función `stats::lm`.
 
@@ -338,6 +398,24 @@ rf_spec <- rand_forest(trees = tune()) |>
   set_mode("regression")
 ```
 
+## Recetas
+
+Las recetas combinan la variable de interés (`cla`) con las variables explicativas permitiendo agregar etapas de modificación posteriores.
+
+Para los modelos lineales se consideran dos recetas para la regresión de `cla`: índice espectral NDVI y la banda B5.
+
+```{r}
+receta_ndvi <- recipe(cla ~ ndvi, data = d)
+receta_b5 <- recipe(cla ~ B5, data = d)
+```
+
+Para los modelos de *machine learning* se definen dos recetas: todas las bandas espectrales disponibles (de B1 a B7), y una selección de las mismas, descartando aquellas menos relevantes para el fenómeno de estudio (B3, B5).
+
+```{r}
+receta_bandas <- recipe(cla ~ B1 + B2 + B3 + B4 + B5 + B6 + B7, data = d)
+receta_select <- recipe(cla ~ B5 + B3, data = d)
+```
+
 ## Workflow
 
 Unifico todas las recetas y especificaciones de los modelos, indicando las combinaciones deseadas, en un `workflow`.
@@ -351,9 +429,9 @@ wf <- workflow_set(
     select = receta_select
   ),
   models = list(
-    lin = lin_spec, 
-    lin = lin_spec, 
-    rf = rf_spec, 
+    lin = lin_spec,
+    lin = lin_spec,
+    rf = rf_spec,
     rf = rf_spec
   ),
   cross = FALSE
@@ -366,6 +444,8 @@ El `workflow` internamente se encuentra vacío previo a la etapa de entrenamient
 #| echo: false
 wf
 ```
+
+# Entrenamiento
 
 Se define la configuración empleada en la optimización de `trees`.
 
@@ -385,7 +465,7 @@ Esta etapa es computacionalmente exigente, demorando varios minutos en procesar.
 #| eval: false
 res <- wf |>
   workflow_map(
-    "tune_race_anova",
+    fn = "tune_race_anova",
     seed = 2002,
     resamples = datos_bootstrap,
     grid = 50,
@@ -405,6 +485,8 @@ El objeto resultante `res` contiene cada modelo entrenado, y dada la configuraci
 #| echo: false
 res
 ```
+
+# Selección del modelo
 
 Exploro y comparo las métricas de desempeño de todos los modelos propuestos entrenados.
 
@@ -437,10 +519,10 @@ El modelos `ndvi_lin` presentó el $RMSE$ más bajo y el $R^2$ más alto. Se lo 
 ```{r}
 #| echo: false
 #| eval: false
-res |> 
-  extract_workflow_set_result(id = "ndvi_lin") |> 
-  collect_metrics() |> 
-  select(.metric, mean) |> 
+res |>
+  extract_workflow_set_result(id = "ndvi_lin") |>
+  collect_metrics() |>
+  select(.metric, mean) |>
   gt::gt() |>
   gt::fmt_number(decimals = 3) |>
   gtExtras::gt_theme_538(
@@ -452,18 +534,6 @@ res |>
 
 ```{r}
 #| eval: false
-res |>
-  rank_results() |>
-  pivot_wider(
-    names_from = .metric,
-    values_from = mean,
-    id_cols = c(wflow_id, .config, rank, model)
-  ) |>
-  slice_min(order_by = rmse, n = 1, with_ties = FALSE) |> 
-  select(wflow_id, rank, rmse, rsq)
-```
-
-```{r}
 #| echo: false
 res |>
   rank_results() |>
@@ -472,8 +542,22 @@ res |>
     values_from = mean,
     id_cols = c(wflow_id, .config, rank, model)
   ) |>
-  slice_min(order_by = rmse, n = 1, with_ties = FALSE) |> 
-  select(wflow_id, rank, rmse, rsq) |> 
+  slice_min(order_by = rmse, n = 1, with_ties = FALSE) |>
+  select(wflow_id, rank, rmse, rsq)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+res |>
+  rank_results() |>
+  pivot_wider(
+    names_from = .metric,
+    values_from = mean,
+    id_cols = c(wflow_id, .config, rank, model)
+  ) |>
+  slice_min(order_by = rmse, n = 1, with_ties = FALSE) |>
+  select(wflow_id, rank, rmse, rsq) |>
   gt::gt() |>
   gt::fmt_number(decimals = 3, columns = c("rmse", "rsq")) |>
   gtExtras::gt_theme_538(
@@ -490,6 +574,8 @@ mejor_res <- res |>
   extract_workflow_set_result("ndvi_lin") |>
   select_best(metric = "rmse")
 ```
+
+# Validación
 
 Con el mejor modelo seleccionado, finalizo el `workflow` y procedo a la etapa de testeo con un último ajuste empleando el conjunto de validación.
 
@@ -510,16 +596,16 @@ extract_workflow(test_res)
 extract_spec_parsnip(test_res)
 ```
 
-Verifico las estimaciones de clorofila-a del conjunto de validación.
+Comparo las estimaciones de `cla` del conjunto de validación.
 
 ```{r}
 collect_predictions(test_res) |>
-  ggplot(aes(x = clo, y = .pred)) +
+  ggplot(aes(x = cla, y = .pred)) +
   geom_abline(color = "gray50", lty = 2) +
   geom_point(size = 4, alpha = .5, color = "dodgerblue") +
   annotate(geom = "text", x = I(.9), y = I(.94), label = "y=x", angle = 45) +
   coord_obs_pred(expand = TRUE) +
-  labs(x = "clo observado (μg/L)", y = "clo estimado (μg/L)") +
+  labs(x = "cla observado (μg/L)", y = "cla estimado (μg/L)") +
   theme_bw() +
   theme_sub_panel(grid.major = element_line(linewidth = .1)) +
   theme_sub_plot(background = element_blank())
@@ -529,17 +615,17 @@ Verifico el intervalo de confianza de la pendiente, que no incluya el cero.
 
 ```{r}
 #| eval: false
-collect_predictions(test_res) |> 
-  lm(.pred ~ clo, data = _) |> 
+collect_predictions(test_res) |>
+  lm(.pred ~ cla, data = _) |>
   confint()
 ```
 
 ```{r}
 #| echo: false
-collect_predictions(test_res) |> 
-  lm(.pred ~ clo, data = _) |> 
-  confint() |> 
-  as.data.frame() |> 
+collect_predictions(test_res) |>
+  lm(.pred ~ cla, data = _) |>
+  confint() |>
+  as.data.frame() |>
   gt::gt(rownames_to_stub = TRUE) |>
   gt::fmt_number(decimals = 3) |>
   gtExtras::gt_theme_538(
@@ -549,7 +635,81 @@ collect_predictions(test_res) |>
   )
 ```
 
-## Explicabilidad
+# Mapa
+
+Se aplica el modelo desarrollado a un producto satelital para inspeccionar la distribución espacial de clorofila-a.
+
+Dado que el algoritmo solo puede aplicarse a píxeles de agua, se calcula el índice espectral MNDWI @xuModificationNormalisedDifference2006, para Landsat-8 definido como:
+
+$$
+MNDWI=\frac{B3-B7}{B3+B7}
+$$
+
+Se obtienen los píxeles de agua y se calcula el NDVI.
+
+```{r}
+r2 <- r_lista[[2]]
+
+mndwi <- (r2$B3 - r2$B7) / (r2$B3 + r2$B7)
+
+m <- thresh(mndwi, method = "otsu")
+m[isTRUE(m)] <- 1
+m[isFALSE(m)] <- NA
+
+agua <- r2 * m
+agua_ndvi <- (agua$B5 - agua$B4) / (agua$B5 + agua$B4)
+terra::set.names(agua_ndvi, "ndvi")
+```
+
+Se verifica que los píxeles de agua sean correctos con una visualización:
+
+```{r}
+#| label: fig-agua
+#| fig-cap: Píxeles de agua del 2025-02-20.
+plot(m, axes = FALSE, col = "dodgerblue", legend = FALSE, box = TRUE)
+north(xy = "topleft", type = 1)
+```
+
+Específicamente, se aplica el workflow del modelo sobre el ráster de agua, obteniendo un ráster con las estimaciones de clorofila-a.
+
+```{r}
+cla_pred <- terra::predict(agua_ndvi, extract_fit_engine(test_res))
+cla_pred[cla_pred > 1000] <- NA
+cla_pred[cla_pred < 0] <- NA
+```
+
+Se crea un mapa para identificar la distribución espacial de clorofila-a y se compara con la imagen RGB.
+
+```{r}
+#| label: fig-clo-pred
+#| fig-cap: Estimación de clorofila-a para 2025-02-20.
+#| fig-subcap: 
+#|   - "RGB"
+#|   - "cla"
+#| layout-ncol: 2
+#| column: screen-inset
+g_rgb <- ggplot() +
+  geom_spatraster_rgb(
+    data = stretch(r2),
+    r = 4,
+    g = 3,
+    b = 2,
+    stretch = "lin"
+  ) +
+  theme_void()
+
+g_cla <- ggplot() +
+  geom_spatraster(data = cla_pred) +
+  scale_fill_whitebox_c(palette = "muted") +
+  labs(fill = "Clorofila-a\n(μg/L)") +
+  theme_void() +
+  theme_sub_legend(key.height = unit(30, "pt"))
+
+g_rgb
+g_cla
+```
+
+# Explicabilidad
 
 Para comprender el efecto que posee cada banda espectral individual sobre el algoritmo, se emplea la técnica de explicabilidad importancia global de variables @biecekExplanatoryModelAnalysis2021a. Se procede a eliminar, una a una, cada variable explicativa del modelo y evaluar el efecto en el desempeño. 
 
@@ -606,85 +766,9 @@ ggplot(vip_df, aes(dropout_loss, variable)) +
   theme_sub_plot(background = element_blank())
 ```
 
-## Mapas
+# Conclusión {.unnumbered}
 
-Se aplica el modelo desarrollado a un producto satelital para inspeccionar la distribución espacial de clorofila-a.
-
-Dado que el algoritmo solo puede aplicarse a píxeles de agua, se calcula el índice espectral MNDWI @xuModificationNormalisedDifference2006, para Landsat-8 definido como:
-
-$$
-MNDWI=\frac{B3-B7}{B3+B7}
-$$
-
-Se obtienen los píxeles de agua y se calcula el NDVI.
-
-```{r}
-r2 <- r_lista[[2]]
-
-mndwi <- (r2$B3 - r2$B7) / (r2$B3 + r2$B7)
-
-m <- thresh(mndwi, method = "otsu")
-m[isTRUE(m)] <- 1
-m[isFALSE(m)] <- NA
-
-f_mascara <- function(X) {
-  y <- thresh(X, method = "otsu")
-  y[isTRUE(y)] <- 1
-  y[isFALSE(y)] <- NA
-  # p <- patches(y)
-  # rz <- zonal(cellSize(p, unit = "m"), p, "sum", as.raster = TRUE)
-  # m <- global(rz, "max", na.rm = TRUE)$max
-  # s <- ifel(rz <= m, NA, y)
-  # h <- fillHoles(s)
-  # return(h)
-  return(y)
-}
-
-# m <- f_mascara(mndwi)
-
-agua <- r2 * m
-agua_ndvi <- (agua$B5 - agua$B4)/(agua$B5 + agua$B4)
-terra::set.names(agua_ndvi, "ndvi")
-```
-
-Se verifica que los píxeles de agua sean correctos con una visualización:
-
-```{r}
-#| label: fig-agua
-#| fig-cap: Píxeles de agua del 2025-02-20.
-plot(m, axes = FALSE, col = "dodgerblue", legend = FALSE, box = TRUE)
-north(xy = "topleft", type = 1)
-```
-
-Específicamente, se aplica el workflow del modelo sobre el ráster de agua, obteniendo un ráster con las estimaciones de clorofila-a.
-
-```{r}
-clo_pred <- terra::predict(agua_ndvi, extract_fit_engine(test_res))
-clo_pred[clo_pred>1000] <- NA
-clo_pred[clo_pred<0] <- NA
-```
-
-Se crea un mapa para identificar la distribución espacial de clorofila-a y se compara con la imagen RGB.
-
-```{r}
-#| label: fig-clo-pred
-#| fig-cap: Estimación de clorofila-a para 2025-02-20.
-g_rgb <- ggplot() +
-  geom_spatraster_rgb(
-    data = stretch(r4), r = 4, g = 3, b = 2, stretch = "lin"
-  ) +
-  theme_void()
-
-g_clo <- ggplot() +
-  geom_spatraster(data = clo_pred) +
-  scale_fill_whitebox_c(palette = "muted") +
-  labs(fill = "Clorofila-a\n(μg/L)") +
-  theme_void() +
-  theme_sub_legend(key.height = unit(30, "pt"))
-
-g_rgb
-g_clo
-```
+XXX
 
 # Referencias {.unnumbered}
 
