@@ -9,6 +9,84 @@
     ]
   },
   "Packages": {
+    "DALEX": {
+      "Package": "DALEX",
+      "Version": "2.5.4",
+      "Source": "Repository",
+      "Title": "moDel Agnostic Language for Exploration and eXplanation",
+      "Authors@R": "c(person(\"Przemyslaw\", \"Biecek\", email = \"przemyslaw.biecek@gmail.com\", role = c(\"aut\", \"cre\"),  comment = c(ORCID = \"0000-0001-8423-1823\")), person(\"Szymon\", \"Maksymiuk\", role = \"aut\", comment = c(ORCID = \"0000-0002-3120-1601\")), person(\"Hubert\", \"Baniecki\", role = \"aut\", comment = c(ORCID = \"0000-0001-6661-5364\")))",
+      "Description": "Any unverified black box model is the path to failure. Opaqueness leads to distrust.  Distrust leads to ignoration. Ignoration leads to rejection.  DALEX package xrays any model and helps to explore and explain its behaviour. Machine Learning (ML) models are widely used and have various applications in classification  or regression. Models created with boosting, bagging, stacking or similar techniques are often used due to their high performance. But such black-box models usually lack direct interpretability. DALEX package contains various methods that help to understand the link between input variables  and model output. Implemented methods help to explore the model on the level of a single instance  as well as a level of the whole dataset. All model explainers are model agnostic and can be compared across different models. DALEX package is the cornerstone for 'DrWhy.AI' universe of packages for visual model exploration. Find more details in (Biecek 2018) <https://jmlr.org/papers/v19/18-416.html>.",
+      "License": "GPL",
+      "Encoding": "UTF-8",
+      "LazyData": "true",
+      "RoxygenNote": "7.3.2",
+      "Depends": [
+        "R (>= 3.5)"
+      ],
+      "Imports": [
+        "ggplot2",
+        "iBreakDown (>= 1.3.1)",
+        "ingredients (>= 2.0)",
+        "kernelshap"
+      ],
+      "Suggests": [
+        "gower",
+        "ranger",
+        "testthat",
+        "methods"
+      ],
+      "URL": "https://modeloriented.github.io/DALEX/, https://dalex.drwhy.ai",
+      "BugReports": "https://github.com/ModelOriented/DALEX/issues",
+      "NeedsCompilation": "no",
+      "Author": "Przemyslaw Biecek [aut, cre] (ORCID: <https://orcid.org/0000-0001-8423-1823>), Szymon Maksymiuk [aut] (ORCID: <https://orcid.org/0000-0002-3120-1601>), Hubert Baniecki [aut] (ORCID: <https://orcid.org/0000-0001-6661-5364>)",
+      "Maintainer": "Przemyslaw Biecek <przemyslaw.biecek@gmail.com>",
+      "Repository": "CRAN"
+    },
+    "DALEXtra": {
+      "Package": "DALEXtra",
+      "Version": "2.3.1",
+      "Source": "Repository",
+      "Title": "Extension for 'DALEX' Package",
+      "Authors@R": "c(person(given = \"Szymon\", family = \"Maksymiuk\", role = c(\"aut\", \"cre\"), email = \"sz.maksymiuk@gmail.com\", comment = c(ORCID = \"0000-0002-3120-1601\")), person(given = \"Przemyslaw\",  family = \"Biecek\",  email = \"przemyslaw.biecek@gmail.com\",  role = c(\"aut\"),  comment = c(ORCID = \"0000-0001-8423-1823\")), person(\"Hubert\", \"Baniecki\", role = \"aut\"), person(\"Anna\", \"Kozak\", role = \"ctb\"))",
+      "Description": "Provides wrapper of various machine learning models.  In applied machine learning, there  is a strong belief that we need to strike a balance  between interpretability and accuracy.  However, in field of the interpretable machine learning,  there are more and more new ideas for explaining black-box models,  that are implemented in 'R'.  'DALEXtra' creates 'DALEX' Biecek (2018) <doi:10.48550/arXiv.1806.08915> explainer for many type of models including those created using 'python' 'scikit-learn' and 'keras' libraries, and 'java' 'h2o' library.  Important part of the package is Champion-Challenger analysis and innovative approach to model performance across subsets of test data presented in Funnel Plot.",
+      "Depends": [
+        "R (>= 3.5.0)",
+        "DALEX (>= 2.4.0)"
+      ],
+      "License": "GPL",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.3",
+      "Imports": [
+        "ggplot2"
+      ],
+      "Suggests": [
+        "auditor",
+        "gbm",
+        "ggrepel",
+        "h2o",
+        "iml",
+        "ingredients",
+        "lime",
+        "localModel",
+        "mlr",
+        "mlr3",
+        "ranger",
+        "recipes",
+        "reticulate",
+        "rmarkdown",
+        "rpart",
+        "stacks",
+        "xgboost",
+        "testthat",
+        "tidymodels"
+      ],
+      "URL": "https://ModelOriented.github.io/DALEXtra/, https://github.com/ModelOriented/DALEXtra",
+      "BugReports": "https://github.com/ModelOriented/DALEXtra/issues",
+      "NeedsCompilation": "no",
+      "Author": "Szymon Maksymiuk [aut, cre] (ORCID: <https://orcid.org/0000-0002-3120-1601>), Przemyslaw Biecek [aut] (ORCID: <https://orcid.org/0000-0001-8423-1823>), Hubert Baniecki [aut], Anna Kozak [ctb]",
+      "Maintainer": "Szymon Maksymiuk <sz.maksymiuk@gmail.com>",
+      "Repository": "CRAN"
+    },
     "DBI": {
       "Package": "DBI",
       "Version": "1.3.0",
@@ -556,6 +634,27 @@
       "NeedsCompilation": "yes",
       "Author": "CRAN Team [ctb] (de facto maintainer in 2013-2026), Duncan Temple Lang [aut] (ORCID: <https://orcid.org/0000-0003-0159-1546>), Tomas Kalibera [ctb], Ivan Krylov [cre]",
       "Maintainer": "Ivan Krylov <ikrylov@disroot.org>",
+      "Repository": "CRAN"
+    },
+    "abind": {
+      "Package": "abind",
+      "Version": "1.4-8",
+      "Source": "Repository",
+      "Date": "2024-09-08",
+      "Title": "Combine Multidimensional Arrays",
+      "Authors@R": "c(person(\"Tony\", \"Plate\", email = \"tplate@acm.org\", role = c(\"aut\", \"cre\")), person(\"Richard\", \"Heiberger\", role = c(\"aut\")))",
+      "Maintainer": "Tony Plate <tplate@acm.org>",
+      "Description": "Combine multidimensional arrays into a single array. This is a generalization of 'cbind' and 'rbind'.  Works with vectors, matrices, and higher-dimensional arrays (aka tensors). Also provides functions 'adrop', 'asub', and 'afill' for manipulating, extracting and replacing data in arrays.",
+      "Depends": [
+        "R (>= 1.5.0)"
+      ],
+      "Imports": [
+        "methods",
+        "utils"
+      ],
+      "License": "MIT + file LICENSE",
+      "NeedsCompilation": "no",
+      "Author": "Tony Plate [aut, cre], Richard Heiberger [aut]",
       "Repository": "CRAN"
     },
     "askpass": {
@@ -1702,6 +1801,42 @@
       "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
       "Repository": "CRAN"
     },
+    "doFuture": {
+      "Package": "doFuture",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Title": "Use Foreach to Parallelize via the Future Framework",
+      "Depends": [
+        "foreach (>= 1.5.0)",
+        "future (>= 1.49.0)"
+      ],
+      "Imports": [
+        "future.apply",
+        "globals",
+        "iterators",
+        "parallel",
+        "utils"
+      ],
+      "Suggests": [
+        "doRNG (>= 1.8.2)",
+        "markdown",
+        "R.rsp"
+      ],
+      "VignetteBuilder": "R.rsp",
+      "Authors@R": "c(person(\"Henrik\", \"Bengtsson\", role = c(\"aut\", \"cre\", \"cph\"), email = \"henrikb@braju.com\", comment = c(ORCID = \"0000-0002-7579-5165\")))",
+      "Description": "The 'future' package provides a unifying parallelization framework for R that supports many parallel and distributed backends <doi:10.32614/RJ-2021-048>. The 'foreach' package provides a powerful API for iterating over an R expression in parallel. The 'doFuture' package brings the best of the two together. There are three ways to use this package. The recommended approach is to use 'y <- foreach(...) %do% { ... } |> futurize()' via the 'futurize' package (<doi:10.48550/arXiv.2601.17578>). The second alternative, which was formerly recommended, is to use 'y <- foreach(...) %dofuture% { ... }', which does not require using 'registerDoFuture()' and has many advantages over '%dopar%'. The third alternative is the traditional 'foreach' approach by registering the 'foreach' adapter 'registerDoFuture()' and so that 'y <- foreach(...) %dopar% { ... }' parallelizes with the 'future' framework.",
+      "License": "Apache License (>= 2)",
+      "LazyLoad": "TRUE",
+      "URL": "https://doFuture.futureverse.org, https://github.com/futureverse/doFuture",
+      "BugReports": "https://github.com/futureverse/doFuture/issues",
+      "Language": "en-US",
+      "Encoding": "UTF-8",
+      "Config/roxygen2/version": "8.0.0",
+      "NeedsCompilation": "no",
+      "Author": "Henrik Bengtsson [aut, cre, cph] (ORCID: <https://orcid.org/0000-0002-7579-5165>)",
+      "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+      "Repository": "CRAN"
+    },
     "dplyr": {
       "Package": "dplyr",
       "Version": "1.2.1",
@@ -2437,61 +2572,55 @@
       "Maintainer": "Thomas Lin Pedersen <thomas.pedersen@posit.co>",
       "Repository": "CRAN"
     },
-    "ggthemes": {
-      "Package": "ggthemes",
-      "Version": "6.0.0",
+    "ggspatial": {
+      "Package": "ggspatial",
+      "Version": "1.1.10",
       "Source": "Repository",
-      "Title": "Extra Themes, Scales and Geoms for 'ggplot2'",
-      "Authors@R": "c(person(\"Jeffrey B.\", \"Arnold\", role = c(\"aut\", \"cre\"), email = \"jeffrey.arnold@gmail.com\",  comment = \"<https://orcid.org/0000-0001-9953-3904>\"), person(\"Gergely\", \"Daroczi\", role = \"ctb\"), person(\"Bo\", \"Werth\", role = \"ctb\"), person(\"Brian\", \"Weitzner\", role = \"ctb\"), person(\"Joshua\", \"Kunst\", role = \"ctb\"), person(\"Baptiste\", \"Auguie\", role = \"ctb\"), person(\"Bob\", \"Rudis\", role = \"ctb\"), person(\"Hadley\", \"Wickham\", role = c(\"ctb\"), comment = \"Code from the ggplot2 package.\"), person(\"Justin\",  \"Talbot\", role = \"ctb\", comment = \"Code from the labeling package\"), person(\"Joshua\", \"London\", role = \"ctb\"))",
+      "Type": "Package",
+      "Title": "Spatial Data Framework for ggplot2",
+      "Authors@R": "c( person(\"Dewey\", \"Dunnington\", email = \"dewey@fishandwhistle.net\",  role = c(\"aut\", \"cre\"),  comment = c(ORCID = \"0000-0002-9415-4582\") ), person(\"Brent\", \"Thorne\", role = \"ctb\", comment = c(ORCID = \"0000-0002-1099-3857\")), person(\"Diego\", \"Hernangómez\", role = \"ctb\", comment = c(ORCID = \"0000-0001-8457-4658\")) )",
+      "Maintainer": "Dewey Dunnington <dewey@fishandwhistle.net>",
+      "Description": "Spatial data plus the power of the ggplot2 framework means easier mapping when input  data are already in the form of spatial objects.",
+      "License": "GPL-3",
       "Depends": [
-        "R (>= 4.1.0)"
+        "R (>= 2.10)"
       ],
       "Imports": [
-        "cli",
+        "sf",
         "ggplot2 (>= 3.0.0)",
-        "graphics",
-        "grid",
-        "lifecycle",
+        "rosm (>= 0.2)",
+        "abind",
         "methods",
-        "purrr",
-        "rlang",
+        "tibble",
         "scales",
-        "stats",
-        "stringr",
-        "tibble"
+        "tidyr",
+        "rlang",
+        "grid",
+        "glue"
       ],
       "Suggests": [
-        "dplyr",
-        "covr",
-        "extrafont",
-        "glue",
+        "prettymapr",
         "knitr",
-        "lattice",
-        "lintr",
-        "maps",
-        "mapproj",
-        "pander",
-        "quantreg",
         "rmarkdown",
-        "spelling",
-        "testthat (>= 3.2.0)",
-        "tidyr",
+        "sp",
+        "raster",
+        "terra",
+        "testthat (>= 3.0.0)",
+        "dplyr",
+        "withr",
+        "ggrepel",
+        "stars",
+        "covr",
         "vdiffr",
-        "withr"
+        "lwgeom"
       ],
-      "Description": "Some extra themes, geoms, and scales for 'ggplot2'. Provides 'ggplot2' themes and scales that replicate the look of plots by Edward Tufte, Stephen Few, 'Fivethirtyeight', 'The Economist', 'Stata', 'Excel', and 'The Wall Street Journal', among others. Provides 'geoms' for Tufte's box plot and range frame.",
-      "License": "GPL-2",
-      "URL": "https://jrnold.github.io/ggthemes/, https://github.com/jrnold/ggthemes",
-      "BugReports": "https://github.com/jrnold/ggthemes/issues",
-      "LazyData": "true",
-      "Language": "en-US",
+      "URL": "https://paleolimbot.github.io/ggspatial/, https://github.com/paleolimbot/ggspatial",
+      "BugReports": "https://github.com/paleolimbot/ggspatial/issues",
+      "RoxygenNote": "7.3.2",
       "Encoding": "UTF-8",
       "Config/testthat/edition": "3",
-      "Config/Needs/website": "pkgdown",
-      "Config/roxygen2/version": "8.1.0",
       "NeedsCompilation": "no",
-      "Author": "Jeffrey B. Arnold [aut, cre] (<https://orcid.org/0000-0001-9953-3904>), Gergely Daroczi [ctb], Bo Werth [ctb], Brian Weitzner [ctb], Joshua Kunst [ctb], Baptiste Auguie [ctb], Bob Rudis [ctb], Hadley Wickham [ctb] (Code from the ggplot2 package.), Justin Talbot [ctb] (Code from the labeling package), Joshua London [ctb]",
-      "Maintainer": "Jeffrey B. Arnold <jeffrey.arnold@gmail.com>",
+      "Author": "Dewey Dunnington [aut, cre] (ORCID: <https://orcid.org/0000-0002-9415-4582>), Brent Thorne [ctb] (ORCID: <https://orcid.org/0000-0002-1099-3857>), Diego Hernangómez [ctb] (ORCID: <https://orcid.org/0000-0001-8457-4658>)",
       "Repository": "CRAN"
     },
     "globals": {
@@ -2679,6 +2808,36 @@
       "RoxygenNote": "7.3.2",
       "NeedsCompilation": "yes",
       "Author": "Mark van der Loo [aut, cre], David Turner [ctb]",
+      "Repository": "CRAN"
+    },
+    "gridExtra": {
+      "Package": "gridExtra",
+      "Version": "2.3.1",
+      "Source": "Repository",
+      "Authors@R": "c(person(\"Baptiste\", \"Auguie\", email = \"baptiste.auguie@vuw.ac.nz\", role = c(\"aut\", \"cre\")), person(\"Anton\", \"Antonov\", email = \"tonytonov@gmail.com\", role = c(\"ctb\")))",
+      "License": "GPL (>= 2)",
+      "Title": "Miscellaneous Functions for \"Grid\" Graphics",
+      "Type": "Package",
+      "Description": "Provides a number of user-level functions to work with \"grid\" graphics, notably to arrange multiple grid-based plots on a page, and draw tables.",
+      "VignetteBuilder": "knitr",
+      "Imports": [
+        "gtable",
+        "grid",
+        "grDevices",
+        "graphics",
+        "utils"
+      ],
+      "Suggests": [
+        "ggplot2",
+        "egg",
+        "lattice",
+        "knitr",
+        "testthat"
+      ],
+      "RoxygenNote": "6.0.1",
+      "NeedsCompilation": "no",
+      "Author": "Baptiste Auguie [aut, cre], Anton Antonov [ctb]",
+      "Maintainer": "Baptiste Auguie <baptiste.auguie@vuw.ac.nz>",
       "Repository": "CRAN"
     },
     "gt": {
@@ -3124,6 +3283,43 @@
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
       "Repository": "CRAN"
     },
+    "iBreakDown": {
+      "Package": "iBreakDown",
+      "Version": "2.1.2",
+      "Source": "Repository",
+      "Title": "Model Agnostic Instance Level Variable Attributions",
+      "Authors@R": "c(person(\"Przemyslaw\", \"Biecek\", email = \"przemyslaw.biecek@gmail.com\", role = c(\"aut\", \"cre\"),  comment = c(ORCID = \"0000-0001-8423-1823\")), person(\"Alicja\", \"Gosiewska\", role = \"aut\", comment = c(ORCID = \"0000-0001-6563-5742\")), person(\"Hubert\", \"Baniecki\", role = \"aut\", comment = c(ORCID = \"0000-0001-6661-5364\")), person(\"Adam\", \"Izdebski\", role = \"aut\"), person(\"Dariusz\", \"Komosinski\", role = \"ctb\"))",
+      "Description": "Model agnostic tool for decomposition of predictions from black boxes. Supports additive attributions and attributions with interactions. The Break Down Table shows contributions of every variable to a final prediction.  The Break Down Plot presents variable contributions in a concise graphical way.  This package works for classification and regression models.  It is an extension of the 'breakDown' package (Staniak and Biecek 2018) <doi:10.32614/RJ-2018-072>, with new and faster strategies for orderings.  It supports interactions in explanations and has interactive visuals (implemented with 'D3.js' library).  The methodology behind is described in the 'iBreakDown' article (Gosiewska and Biecek 2019) <arXiv:1903.11420> This package is a part of the 'DrWhy.AI' universe (Biecek 2018) <arXiv:1806.08915>.",
+      "Depends": [
+        "R (>= 3.5)"
+      ],
+      "License": "GPL-3",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.2.2",
+      "Imports": [
+        "ggplot2"
+      ],
+      "Suggests": [
+        "DALEX",
+        "knitr",
+        "rmarkdown",
+        "randomForest",
+        "e1071",
+        "ranger",
+        "nnet",
+        "testthat",
+        "r2d3",
+        "jsonlite",
+        "covr"
+      ],
+      "VignetteBuilder": "knitr",
+      "URL": "https://ModelOriented.github.io/iBreakDown/, https://github.com/ModelOriented/iBreakDown",
+      "BugReports": "https://github.com/ModelOriented/iBreakDown/issues",
+      "NeedsCompilation": "no",
+      "Author": "Przemyslaw Biecek [aut, cre] (<https://orcid.org/0000-0001-8423-1823>), Alicja Gosiewska [aut] (<https://orcid.org/0000-0001-6563-5742>), Hubert Baniecki [aut] (<https://orcid.org/0000-0001-6661-5364>), Adam Izdebski [aut], Dariusz Komosinski [ctb]",
+      "Maintainer": "Przemyslaw Biecek <przemyslaw.biecek@gmail.com>",
+      "Repository": "CRAN"
+    },
     "ids": {
       "Package": "ids",
       "Version": "1.0.1",
@@ -3206,6 +3402,44 @@
       "NeedsCompilation": "no",
       "Author": "Andrew Bray [aut], Chester Ismay [aut] (ORCID: <https://orcid.org/0000-0003-2820-2547>), Evgeni Chasnovski [aut] (ORCID: <https://orcid.org/0000-0002-1617-4019>), Simon Couch [aut, cre] (ORCID: <https://orcid.org/0000-0001-5676-5107>), Ben Baumer [aut] (ORCID: <https://orcid.org/0000-0002-3279-0516>), Mine Cetinkaya-Rundel [aut] (ORCID: <https://orcid.org/0000-0001-6452-2420>), Ted Laderas [ctb] (ORCID: <https://orcid.org/0000-0002-6207-7068>), Nick Solomon [ctb], Johanna Hardin [ctb], Albert Y. Kim [ctb] (ORCID: <https://orcid.org/0000-0001-7824-306X>), Neal Fultz [ctb], Doug Friedman [ctb], Richie Cotton [ctb] (ORCID: <https://orcid.org/0000-0003-2504-802X>), Brian Fannin [ctb]",
       "Maintainer": "Simon Couch <simon.couch@posit.co>",
+      "Repository": "CRAN"
+    },
+    "ingredients": {
+      "Package": "ingredients",
+      "Version": "2.3.0",
+      "Source": "Repository",
+      "Title": "Effects and Importances of Model Ingredients",
+      "Authors@R": "c(person(\"Przemyslaw\", \"Biecek\", email = \"przemyslaw.biecek@gmail.com\", role = c(\"aut\", \"cre\"), comment = c(ORCID = \"0000-0001-8423-1823\")), person(\"Hubert\", \"Baniecki\", role = \"aut\", comment = c(ORCID = \"0000-0001-6661-5364\")), person(\"Adam\", \"Izdebski\", role = \"ctb\"))",
+      "Description": "Collection of tools for assessment of feature importance and feature effects. Key functions are: feature_importance() for assessment of global level feature importance, ceteris_paribus() for calculation of the what-if plots, partial_dependence() for partial dependence plots, conditional_dependence() for conditional dependence plots, accumulated_dependence() for accumulated local effects plots, aggregate_profiles() and cluster_profiles() for aggregation of ceteris paribus profiles, generic print() and plot() for better usability of selected explainers, generic plotD3() for interactive, D3 based explanations, and generic describe() for explanations in natural language. The package 'ingredients' is a part of the 'DrWhy.AI' universe (Biecek 2018) <arXiv:1806.08915>.",
+      "Depends": [
+        "R (>= 3.5)"
+      ],
+      "License": "GPL-3",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.2.3",
+      "Imports": [
+        "ggplot2",
+        "scales",
+        "gridExtra",
+        "methods"
+      ],
+      "Suggests": [
+        "DALEX",
+        "gower",
+        "ranger",
+        "testthat",
+        "r2d3",
+        "jsonlite",
+        "knitr",
+        "rmarkdown",
+        "covr"
+      ],
+      "URL": "https://ModelOriented.github.io/ingredients/, https://github.com/ModelOriented/ingredients",
+      "BugReports": "https://github.com/ModelOriented/ingredients/issues",
+      "VignetteBuilder": "knitr",
+      "NeedsCompilation": "no",
+      "Author": "Przemyslaw Biecek [aut, cre] (<https://orcid.org/0000-0001-8423-1823>), Hubert Baniecki [aut] (<https://orcid.org/0000-0001-6661-5364>), Adam Izdebski [ctb]",
+      "Maintainer": "Przemyslaw Biecek <przemyslaw.biecek@gmail.com>",
       "Repository": "CRAN"
     },
     "ipred": {
@@ -3306,6 +3540,25 @@
       "Maintainer": "Folashade Daniel <fdaniel@microsoft.com>",
       "Repository": "CRAN"
     },
+    "jpeg": {
+      "Package": "jpeg",
+      "Version": "0.1-11",
+      "Source": "Repository",
+      "Title": "Read and write JPEG images",
+      "Author": "Simon Urbanek [aut, cre, cph] (https://urbanek.org, <https://orcid.org/0000-0003-2297-1732>)",
+      "Authors@R": "person(\"Simon\", \"Urbanek\", role=c(\"aut\",\"cre\",\"cph\"), email=\"Simon.Urbanek@r-project.org\", comment=c(\"https://urbanek.org\", ORCID=\"0000-0003-2297-1732\"))",
+      "Maintainer": "Simon Urbanek <Simon.Urbanek@r-project.org>",
+      "Depends": [
+        "R (>= 2.9.0)"
+      ],
+      "Description": "This package provides an easy and simple way to read, write and display bitmap images stored in the JPEG format. It can read and write both files and in-memory raw vectors.",
+      "License": "GPL-2 | GPL-3",
+      "SystemRequirements": "libjpeg",
+      "URL": "https://www.rforge.net/jpeg/",
+      "BugReports": "https://github.com/s-u/jpeg/issues",
+      "NeedsCompilation": "yes",
+      "Repository": "CRAN"
+    },
     "jquerylib": {
       "Package": "jquerylib",
       "Version": "0.1.4",
@@ -3380,6 +3633,36 @@
       "NeedsCompilation": "no",
       "Author": "Richard Iannone [aut, cre, cph] (<https://orcid.org/0000-0003-3925-190X>), Automattic [cph] (juice library), juice contributors [ctb] (juice library)",
       "Maintainer": "Richard Iannone <riannone@me.com>",
+      "Repository": "CRAN"
+    },
+    "kernelshap": {
+      "Package": "kernelshap",
+      "Version": "0.9.1",
+      "Source": "Repository",
+      "Title": "Kernel SHAP",
+      "Authors@R": "c( person(\"Michael\", \"Mayer\", , \"mayermichael79@gmail.com\", role = c(\"aut\", \"cre\"), comment = c(ORCID = \"0009-0007-2540-9629\")), person(\"David\", \"Watson\", , \"david.s.watson11@gmail.com\", role = \"aut\", comment = c(ORCID = \"0000-0001-9632-2159\")), person(\"Przemyslaw\", \"Biecek\", , \"przemyslaw.biecek@gmail.com\", role = \"ctb\", comment = c(ORCID = \"0000-0001-8423-1823\")) )",
+      "Description": "Efficient implementation of Kernel SHAP (Lundberg and Lee, 2017, <doi:10.48550/arXiv.1705.07874>) permutation SHAP, and additive SHAP for model interpretability.  For Kernel SHAP and permutation SHAP, if the number of features is too large for exact calculations, the algorithms iterate until the SHAP values are sufficiently precise in terms of their standard errors.  The package integrates smoothly with meta-learning packages such as 'tidymodels', 'caret' or 'mlr3'. It supports multi-output models, case weights, and parallel computations.  Visualizations can be done using the R package 'shapviz'.",
+      "License": "GPL (>= 2)",
+      "Depends": [
+        "R (>= 3.2.0)"
+      ],
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.2",
+      "Imports": [
+        "doFuture",
+        "foreach",
+        "stats",
+        "utils"
+      ],
+      "Suggests": [
+        "testthat (>= 3.0.0)"
+      ],
+      "Config/testthat/edition": "3",
+      "URL": "https://github.com/ModelOriented/kernelshap",
+      "BugReports": "https://github.com/ModelOriented/kernelshap/issues",
+      "NeedsCompilation": "no",
+      "Author": "Michael Mayer [aut, cre] (ORCID: <https://orcid.org/0009-0007-2540-9629>), David Watson [aut] (ORCID: <https://orcid.org/0000-0001-9632-2159>), Przemyslaw Biecek [ctb] (ORCID: <https://orcid.org/0000-0001-8423-1823>)",
+      "Maintainer": "Michael Mayer <mayermichael79@gmail.com>",
       "Repository": "CRAN"
     },
     "knitr": {
@@ -4496,6 +4779,25 @@
       "Maintainer": "Hadley Wickham <hadley@rstudio.com>",
       "Repository": "CRAN"
     },
+    "png": {
+      "Package": "png",
+      "Version": "0.1-9",
+      "Source": "Repository",
+      "Title": "Read and write PNG images",
+      "Author": "Simon Urbanek [aut, cre, cph] (https://urbanek.nz, ORCID: <https://orcid.org/0000-0003-2297-1732>)",
+      "Authors@R": "person(\"Simon\", \"Urbanek\", role=c(\"aut\",\"cre\",\"cph\"), email=\"Simon.Urbanek@r-project.org\", comment=c(\"https://urbanek.nz\", ORCID=\"0000-0003-2297-1732\"))",
+      "Maintainer": "Simon Urbanek <Simon.Urbanek@r-project.org>",
+      "Depends": [
+        "R (>= 2.9.0)"
+      ],
+      "Description": "This package provides an easy and simple way to read, write and display bitmap images stored in the PNG format. It can read and write both files and in-memory raw vectors.",
+      "License": "GPL-2 | GPL-3",
+      "SystemRequirements": "libpng",
+      "URL": "https://www.rforge.net/png/",
+      "BugReports": "https://github.com/s-u/png/issues/",
+      "NeedsCompilation": "yes",
+      "Repository": "CRAN"
+    },
     "prettyunits": {
       "Package": "prettyunits",
       "Version": "1.2.0",
@@ -5486,6 +5788,48 @@
       "NeedsCompilation": "no",
       "Author": "JJ Allaire [aut], Yihui Xie [aut, cre] (ORCID: <https://orcid.org/0000-0003-0645-5666>), Christophe Dervieux [aut] (ORCID: <https://orcid.org/0000-0003-4474-2498>), Jonathan McPherson [aut], Javier Luraschi [aut], Kevin Ushey [aut], Aron Atkins [aut], Hadley Wickham [aut], Joe Cheng [aut], Winston Chang [aut], Richard Iannone [aut] (ORCID: <https://orcid.org/0000-0003-3925-190X>), Andrew Dunning [ctb] (ORCID: <https://orcid.org/0000-0003-0464-5036>), Atsushi Yasumoto [ctb, cph] (ORCID: <https://orcid.org/0000-0002-8335-495X>, cph: Number sections Lua filter), Barret Schloerke [ctb], Carson Sievert [ctb] (ORCID: <https://orcid.org/0000-0002-4958-2844>), Devon Ryan [ctb] (ORCID: <https://orcid.org/0000-0002-8549-0971>), Frederik Aust [ctb] (ORCID: <https://orcid.org/0000-0003-4900-788X>), Jeff Allen [ctb], JooYoung Seo [ctb] (ORCID: <https://orcid.org/0000-0002-4064-6012>), Malcolm Barrett [ctb], Rob Hyndman [ctb], Romain Lesur [ctb], Roy Storey [ctb], Ruben Arslan [ctb], Sergio Oller [ctb], Posit Software, PBC [cph, fnd], jQuery UI contributors [ctb, cph] (jQuery UI library; authors listed in inst/rmd/h/jqueryui/AUTHORS.txt), Mark Otto [ctb] (Bootstrap library), Jacob Thornton [ctb] (Bootstrap library), Bootstrap contributors [ctb] (Bootstrap library), Twitter, Inc [cph] (Bootstrap library), Alexander Farkas [ctb, cph] (html5shiv library), Scott Jehl [ctb, cph] (Respond.js library), Ivan Sagalaev [ctb, cph] (highlight.js library), Greg Franko [ctb, cph] (tocify library), John MacFarlane [ctb, cph] (Pandoc templates), Google, Inc. [ctb, cph] (ioslides library), Dave Raggett [ctb] (slidy library), W3C [cph] (slidy library), Dave Gandy [ctb, cph] (Font-Awesome), Ben Sperry [ctb] (Ionicons), Drifty [cph] (Ionicons), Aidan Lister [ctb, cph] (jQuery StickyTabs), Benct Philip Jonsson [ctb, cph] (pagebreak Lua filter), Albert Krewinkel [ctb, cph] (pagebreak Lua filter)",
       "Maintainer": "Yihui Xie <xie@yihui.name>",
+      "Repository": "CRAN"
+    },
+    "rosm": {
+      "Package": "rosm",
+      "Version": "0.3.2",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Plot Raster Map Tiles from Open Street Map and Other Sources",
+      "Encoding": "UTF-8",
+      "Authors@R": "c(person(\"Dewey\", \"Dunnington\", role = c(\"aut\", \"cre\"), email = \"dewey@fishandwhistle.net\", comment = c(ORCID = \"0000-0002-9415-4582\")), person(\"Timothée\", \"Giraud\", role = \"ctb\"))",
+      "Maintainer": "Dewey Dunnington <dewey@fishandwhistle.net>",
+      "Description": "Download and plot Open Street Map <https://www.openstreetmap.org/>, Bing Maps <https://www.bing.com/maps> and other tiled map sources. Use to create  basemaps quickly and add hillshade to vector-based maps.",
+      "License": "GPL-2",
+      "Imports": [
+        "curl",
+        "jpeg",
+        "png",
+        "wk",
+        "glue",
+        "progress",
+        "rlang"
+      ],
+      "Suggests": [
+        "sp",
+        "plyr",
+        "raster",
+        "testthat (>= 3.0.0)",
+        "withr",
+        "sf",
+        "terra",
+        "abind",
+        "methods",
+        "jsonlite",
+        "tiff",
+        "vdiffr"
+      ],
+      "URL": "https://github.com/paleolimbot/rosm",
+      "BugReports": "https://github.com/paleolimbot/rosm/issues",
+      "Config/testthat/edition": "3",
+      "Config/roxygen2/version": "8.0.0",
+      "NeedsCompilation": "no",
+      "Author": "Dewey Dunnington [aut, cre] (ORCID: <https://orcid.org/0000-0002-9415-4582>), Timothée Giraud [ctb]",
       "Repository": "CRAN"
     },
     "rpart": {
