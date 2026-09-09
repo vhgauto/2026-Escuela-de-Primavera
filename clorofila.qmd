@@ -2,7 +2,7 @@
 title: "<b style='font-size: 2em;'>Hands-on: Semi-empirical Algorithms and Water Quality Indicator Modelling</b>"
 subtitle: Escuela de Primavera 2026 - Instituto Gulich
 date: 2026-09-21
-abstract: Modelización de clorofila-a en el Lago San Roque a partir de muestreos de campo y productos Landsat 8
+abstract: Modelización de clorofila-a en el Embalse San Roque a partir de muestreos de campo y productos Landsat 8/9
 format: 
   html:
     embed-resources: true
