@@ -25,3 +25,5 @@ air*
 test*
 ipynb*
 tp_clorofila/*.rds
+*.ipynb
+*.csv
