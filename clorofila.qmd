@@ -61,6 +61,24 @@ editor_options:
 ```{r}
 #| echo: false
 knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
+
+gt_estilo <- function(TABLA) {
+  TABLA |>
+    gt::tab_style(
+      style = gt::cell_text(align = "center"),
+      locations = gt::cells_body()
+    ) |>
+    gt::tab_style(
+      style = gt::cell_text(align = "center"),
+      locations = gt::cells_column_labels()
+    ) |>
+    gtExtras::gt_theme_538(
+      quiet = TRUE,
+      row.striping.background_color = "#fafafa",
+      row.striping.include_table_body = TRUE,
+      table.width = gt::pct(100),
+    )
+}
 ```
 
 ## Área de Estudio y la Importancia de la Clorofila-a {.unnumbered}
@@ -207,11 +225,7 @@ reflect_tbl <- map(r_lista, f_reflect) |>
 #| label: tbl-reflect
 gt::gt(head(reflect_tbl, 10)) |>
   gt::fmt_number(decimals = 4) |>
-  gtExtras::gt_theme_538(
-    quiet = TRUE,
-    row.striping.background_color = "#fafafa",
-    row.striping.include_table_body = TRUE
-  )
+  gt_estilo()
 ```
 
 Los datos de clorofila-a provienen de un archivo de texto (`.csv`) que contiene la fecha de muestreo, el nombre del sitio y la medición en μg/l.
@@ -228,11 +242,7 @@ cla_tbl <- read_csv("tp_clorofila/datos/clorofila.csv")
 #| tbl-cap-location: margin
 gt::gt(head(cla_tbl, 10)) |>
   gt::fmt_number(decimals = 1) |>
-  gtExtras::gt_theme_538(
-    quiet = TRUE,
-    row.striping.background_color = "#fafafa",
-    row.striping.include_table_body = TRUE
-  )
+  gt_estilo()
 ```
 
 Finalmente, se combinan los datos espectrales con las mediciones de `cla`, a partir del nombre del sitio y la fecha. Para la modelización se seleccionan únicamente las bandas y el valor de `cla`.
@@ -249,11 +259,7 @@ reflect_cla <- inner_join(reflect_tbl, cla_tbl, by = join_by(fecha, sitio)) |>
 #| label: tbl-reflect-cla
 gt::gt(head(reflect_cla, 10)) |>
   gt::fmt_number(decimals = 5, columns = starts_with("B")) |>
-  gtExtras::gt_theme_538(
-    quiet = TRUE,
-    row.striping.background_color = "#fafafa",
-    row.striping.include_table_body = TRUE
-  )
+  gt_estilo()
 ```
 
 # Correlaciones {#sec-corr}
@@ -315,11 +321,7 @@ pivot_longer(
   gt::gt() |>
   gt::fmt_number(decimals = 3, columns = "r") |>
   gt::fmt_number(decimals = 6, columns = "pvalor") |>
-  gtExtras::gt_theme_538(
-    quiet = TRUE,
-    row.striping.background_color = "#fafafa",
-    row.striping.include_table_body = TRUE
-  )
+  gt_estilo()
 ```
 
 Esta tabla permite generar modelos candidatos con mejor criterio.
@@ -455,6 +457,11 @@ res <- wf |>
     grid = 50,
     control = race_ctrl
   )
+```
+
+```{r}
+#| eval: true
+#| echo: false
 res
 ```
 
@@ -510,11 +517,7 @@ res |>
   select(wflow_id, rank, rmse, rsq) |>
   gt::gt() |>
   gt::fmt_number(decimals = 3, columns = c("rmse", "rsq")) |>
-  gtExtras::gt_theme_538(
-    quiet = TRUE,
-    row.striping.background_color = "#fafafa",
-    row.striping.include_table_body = TRUE
-  )
+  gt_estilo()
 ```
 
 Se elije el mejor modelo, utilizando el RMSE como parámetro de selección.
@@ -573,16 +576,12 @@ collect_metrics(val_res) |>
 #| tbl-cap: Métricas de desempeño del algoritmo luego de la validación.
 #| tbl-cap-location: margin
 #| label: tbl-test-validacion
-collect_metrics(val_res) |> 
-  pivot_wider(names_from = .metric, values_from = .estimate) |> 
-  select(rmse, rsq) |> 
+collect_metrics(val_res) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  select(rmse, rsq) |>
   gt::gt() |>
   gt::fmt_number(decimals = 3) |>
-  gtExtras::gt_theme_538(
-    quiet = TRUE,
-    row.striping.background_color = "#fafafa",
-    row.striping.include_table_body = TRUE
-  )
+  gt_estilo()
 ```
 
 Verifico que intervalo de confianza (95%) de la pendiente (`cla`) no incluya el cero entre las mediciones y las estimaciones.
@@ -605,11 +604,7 @@ collect_predictions(val_res) |>
   as.data.frame() |>
   gt::gt(rownames_to_stub = TRUE) |>
   gt::fmt_number(decimals = 3) |>
-  gtExtras::gt_theme_538(
-    quiet = TRUE,
-    row.striping.background_color = "#fafafa",
-    row.striping.include_table_body = TRUE
-  )
+  gt_estilo()
 ```
 
 # Mapa {#sec-mapa}
@@ -725,7 +720,6 @@ Verifico la contribución de cada banda con boxplots.
 #| fig-cap: Importancia global de variables del modelo RF.
 #| fig-cap-location: margin
 #| label: fig-import
-#| column: page-inset-right
 vip_df <- as_tibble(vip) |>
   filter(variable != "_full_model_") |>
   filter(variable != "_baseline_") |>
@@ -756,14 +750,10 @@ XXX
 
 ```{r}
 #| echo: false
-read.csv("versiones.csv") |> 
-  gt::gt() |> 
-  gt::fmt_url(columns = "url") |> 
-  gtExtras::gt_theme_538(
-    quiet = TRUE,
-    row.striping.background_color = "#fafafa",
-    row.striping.include_table_body = TRUE
-  )
+read.csv("versiones.csv") |>
+  gt::gt() |>
+  gt::fmt_url(columns = "url") |>
+  gt_estilo()
 ```
 
 :::
