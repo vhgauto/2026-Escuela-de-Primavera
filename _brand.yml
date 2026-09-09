@@ -4,6 +4,8 @@ color:
     gris-claro: "#fafafa"
     violeta: "#483d7d"
     purpura: "#b86092"
+    azul: "#224289"
+    rosa: "#f79cd4"
   background: gris-claro
   foreground: negro
   primary: black
@@ -22,7 +24,7 @@ typography:
   base: Lato
   headings:
     family: Gelasio
-    color: violeta
+    color: azul
     weight: 700
   monospace: Fira Code
   link:
