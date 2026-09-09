@@ -21,3 +21,7 @@ tp_prisma/*.R
 .Rproj.user
 .vscode
 renv/
+air*
+test*
+ipynb*
+tp_clorofila/*.rds
