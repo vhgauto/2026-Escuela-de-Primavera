@@ -498,7 +498,7 @@ f_entrenamiento("rmse")
 f_entrenamiento("rsq")
 ```
 
-El modelo `ndvi_lin` presentó el $RMSE$ más bajo y el $R^2$ más alto. Se lo elije para la etapa de validación.
+El modelo `ndvi_lin` presentó el RMSE más bajo y el R^2 más alto. Se lo elije para la etapa de validación.
 
 ```{r}
 #| echo: false
@@ -607,6 +607,22 @@ collect_predictions(val_res) |>
   gt_estilo()
 ```
 
+La expresión del modelo seleccionado, para `cla` en μg/L, resulta:
+
+```{r}
+#| echo: false
+const <- extract_fit_engine(val_res) |> 
+  tidy() |> 
+  pull(estimate) |> 
+  round(2)
+```
+
+$$
+cla=`{r} const[1]`+`{r} const[2]` \cdot NDVI
+$$
+
+
+
 # Mapa {#sec-mapa}
 
 Se aplica el modelo desarrollado a un producto satelital para inspeccionar la distribución espacial de clorofila-a sobre el Embalse San Roque.
@@ -657,15 +673,18 @@ Se crea un mapa para identificar la distribución espacial de clorofila-a.
 ggplot() +
   geom_spatraster(data = cla_pred) +
   ggspatial::annotation_north_arrow(
-    location = "tl", width = unit(20, "pt"), height = unit(30, "pt")
+    location = "tl",
+    width = unit(20, "pt"),
+    height = unit(30, "pt")
   ) +
   ggspatial::annotation_scale(location = "br", width_hint = .3) +
   scale_fill_whitebox_c(palette = "muted", breaks = scales::breaks_width(10)) +
-  labs(fill = "Clorofila-a\n(μg/L)") +
+  labs(title = r2_fecha, fill = "Clorofila-a\n(μg/L)") +
   theme_minimal() +
   theme_sub_legend(key.height = unit(45, "pt")) +
   theme_sub_panel(
-    background = element_blank(), grid.major = element_line(linetype = 2)
+    background = element_rect(fill = "grey95"),
+    grid.major = element_line(linetype = 2, color = "grey80", linewidth = .3)
   ) +
   theme_sub_plot(background = element_blank()) +
   theme_sub_axis_left(text = element_text(angle = 90, hjust = .5))
@@ -737,7 +756,11 @@ Dentro del modelo RF de dos bandas, la banda espectral `B5` posee una mayor cont
 
 # Conclusión {.unnumbered #sec-conclusion}
 
-XXX
+Se logró la modelización de clorofila-a en el Embalse San Roque. La combinación de reflectancias de superficie provenientes de productos Landsat-8/9 y mediciones in situ de clorofila-a permitieron generar una base de datos para el desarrollo de un algoritmo.
+
+Diferentes modelos candidatos fueron propuestos, incluyendo expresiones lineales simples y de aprendizaje automático mediante random forest. El mejor modelo resultó una ecuación lineal con NDVI como variable explicativa.
+
+Al aplicar el modelo desarrollado sobre un recorte del Embalse San Roque se obtuvo un mapa de distribución de clorofila-a.
 
 # Referencias {.unnumbered #sec-referencias}
 
