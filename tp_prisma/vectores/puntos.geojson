@@ -3,6 +3,7 @@
 "name": "puntos",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32720" } },
 "features": [
+{ "type": "Feature", "properties": { "puntos": "Algas", "id": 4 }, "geometry": { "type": "Point", "coordinates": [ 360893.2143296264112, 6529016.283852473832667 ] } },
 { "type": "Feature", "properties": { "puntos": "Urbano", "id": 1 }, "geometry": { "type": "Point", "coordinates": [ 358252.0, 6523817.0 ] } },
 { "type": "Feature", "properties": { "puntos": "Agua", "id": 2 }, "geometry": { "type": "Point", "coordinates": [ 359691.0, 6526540.0 ] } },
 { "type": "Feature", "properties": { "puntos": "Vegetación", "id": 3 }, "geometry": { "type": "Point", "coordinates": [ 361951.0, 6526078.0 ] } }
