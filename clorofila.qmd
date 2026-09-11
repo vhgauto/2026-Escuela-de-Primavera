@@ -9,8 +9,8 @@ format:
     number-sections: true
     brand: true
     html-math-method: katex
-    bibliography: biblio.bib
-    csl: ieee.csl
+    bibliography: biblio_cla.bib
+    csl: https://raw.githubusercontent.com/citation-style-language/styles/refs/heads/master/ieee.csl
     fig-dpi: 300
     toc: true
     toc-title: Contenido
@@ -36,7 +36,7 @@ author:
     email: victor.gauto@ca.frre.utn.edu.ar
     affiliation:
       - name: GISTAQ
-        url: https://www.instagram.com/gistaq.utn
+        url: https://www.frre.utn.edu.ar/secretaria_de_ciencia_y_tecnologia/investigacion/GISTAQ/
   - name: Dra. Anabella Ferral
     affiliation:
       - name: Instituto Gulich
@@ -335,10 +335,10 @@ Dado que esta división es aleatoria, es relevante mantener la reproducibilidad 
 ```{r}
 #| warning: false
 set.seed(2000)
-datos_split <- initial_split(d, strata = cla, prop = 3/4)
+datos_split <- initial_split(d, strata = cla, prop = 3 / 4)
 datos_train <- training(datos_split)
 datos_test <- testing(datos_split)
-datos_split 
+datos_split
 ```
 
 # Re-muestreo {#sec-remuestreo}
@@ -349,7 +349,7 @@ Aplico bootstraping @davisonBootstrapMethodsTheir1997 a los datos de entrenamien
 #| warning: false
 set.seed(2001)
 datos_bootstrap <- bootstraps(datos_train, strata = cla, times = 25)
-datos_bootstrap 
+datos_bootstrap
 ```
 
 # Construcción de Modelos {#sec-construc-mod}
@@ -566,8 +566,8 @@ Las métricas finales del modelo resultan:
 
 ```{r}
 #| eval: false
-collect_metrics(val_res) |> 
-  pivot_wider(names_from = .metric, values_from = .estimate) |> 
+collect_metrics(val_res) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
   select(rmse, rsq)
 ```
 
@@ -611,9 +611,9 @@ La expresión del modelo seleccionado, para `cla` en μg/L, resulta:
 
 ```{r}
 #| echo: false
-const <- extract_fit_engine(val_res) |> 
-  tidy() |> 
-  pull(estimate) |> 
+const <- extract_fit_engine(val_res) |>
+  tidy() |>
+  pull(estimate) |>
   round(2)
 ```
 

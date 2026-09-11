@@ -1,0 +1,479 @@
+---
+title: "<b style='font-size: 2em;'>Hands-on: PRISMA Processing</b>"
+subtitle: Escuela de Primavera 2026 - Instituto Gulich
+date: 2026-09-21
+abstract: Procesamiento de imagen hiperespectral PRISMA y cálculo de *spectral angle mapper* y *principal component analysis*
+format: 
+  html:
+    embed-resources: true
+    number-sections: true
+    brand: true
+    html-math-method: katex
+    bibliography: biblio_prisma.bib
+    csl: https://raw.githubusercontent.com/citation-style-language/styles/refs/heads/master/ieee.csl
+    fig-dpi: 300
+    toc: true
+    toc-title: Contenido
+    crossrefs-hover: false
+    toc-location: left
+    render-on-save: true
+    lang: es
+    language: 
+      title-block-author-plural: "Integrantes"
+    syntax-highlighting: kate
+    code-block-bg: "#f2f2f2"
+    code-link: true
+    code-copy: true
+    code-links:
+      - repo: https://github.com/vhgauto/2026-Escuela-de-Primavera
+        text: "Ver en GitHub"
+        icon: github
+        href: https://github.com/vhgauto/2026-Escuela-de-Primavera
+    link-external-newwindow: true
+author: 
+  - name: Mgtr. Víctor Gauto
+    orcid: 0000-0001-9960-8558
+    corresponding: true
+    email: victor.gauto@ca.frre.utn.edu.ar
+    affiliation:
+      - name: GISTAQ
+        url: https://www.frre.utn.edu.ar/secretaria_de_ciencia_y_tecnologia/investigacion/GISTAQ/
+  - name: Dra. Anabella Ferral
+    affiliation:
+      - name: Instituto Gulich
+        url: https://ig.conae.unc.edu.ar/
+    orcid: 0000-0002-9383-7728
+execute: 
+  echo: true
+  eval: true
+nocite: |
+  @*
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(dev.args = list(bg = "transparent"))
+
+gt_estilo <- function(TABLA) {
+  TABLA |>
+    gt::tab_style(
+      style = gt::cell_text(align = "center"),
+      locations = gt::cells_body()
+    ) |>
+    gt::tab_style(
+      style = gt::cell_text(align = "center"),
+      locations = gt::cells_column_labels()
+    ) |>
+    gtExtras::gt_theme_538(
+      quiet = TRUE,
+      row.striping.background_color = "#fafafa",
+      row.striping.include_table_body = TRUE,
+      table.width = gt::pct(100),
+    )
+}
+
+if (FALSE) {
+  library("prismaread")
+}
+```
+
+## Misión PRISMA {.unnumbered}
+
+PRISMA es una misión satelital pre-operativa, que apunta poner a prueba la tecnología presente. Pretende realizar contribuciones en la generación de productos de uso académico y científico para el estudio del ambiente y manejo de riesgos @Meini2015. Se encuentra en órbita desde marzo de 2019 @Loizzo2018, contiene montados dos sensores en rango visible e infrarrojo, con una de resolución espacial de 30 m; y una banda pancromática (400-700 nm) de 5 m de resolución espacial. El rango espectral está comprendido entre los 400 a 2500 nm, con 231 bandas espectrales.
+
+Sus principales usos en investigación incluyen análisis de bosques, agricultura de precisión, cambio climático, estudios del ambiente y calidad del agua, como ser monitoreo de la concentración de clorofila-a o blooms algales @Loizzo2018. PRISMA ofrece productos a tope-de-atmósfera con pocas diferencias respecto de aquellos dados por Sentinel-2 @Giardino2020. Al comparar PRISMA con Sentinel-2, la calidad del agua estimada mediante PRISMA se corresponde adecuadamente con los resultados esperables @Niroumand-Jadidi2020. Incluso otras características del agua, como ser la concentración de ficocianina, puede obtenerse mediante los productos hiperespectrales PRISMA @OShea2021.
+
+## Spectral Angle Mapper {.unnumbered}
+
+SAM es una técnica de clasificación basada en datos espectrales. Calcula un ángulo  entre los píxeles de la región de interés y píxeles con un espectro de referencia (*endmembers*).
+
+La similitud espectral se obtiene al calcular el ángulo entre firmas espectrales, como un vector $n$-dimensional, con $n$ siendo el número de bandas disponibles. Los productos hiperespectrales, al poseer gran número de bandas espectrales, ofrece gran detalle y permiten identificar coberturas similares.
+
+Ángulos bajos entre un píxel dado y un endmember indican un parecido espectral. Cuanto mayor es el ángulo, más diferentes son los espectros comparados.
+
+## Principal Component Analysis {.unnumbered}
+
+PCA permite reducir la dimensionalidad de un sistema que posee gran número de variables. Se transforman los parámetros originales creando nuevos (`PC`), mediante transformaciones lineales.
+
+La técnica PCA suele emplearse cuando las variables posee alta correlación lineal, por lo que se desea reducir la cantidad de parámetros disponibles.
+
+El primero componente principal (`PC1`) se construye al transformar linealmente las variables originales disponibles, que explica la mayor cantidad de varianza del sistema. `PC2`, por lo tanto, permite explicar la varianza restante (no explicada por `PC1`), luego de remover el efecto de `PC1`. Esto se repite tantas veces como bandas espectrales presentes, explicando en su totalidad el sistema de estudio.
+
+## Hoja de Ruta de la Práctica {.unnumbered}
+
+1. Obtención de Datos. Se convierte el producto PRISMA y se recorta a la región de interés. A partir de un vector se extraen las firmas espectrales de los endmembers. @sec-datos.
+2. Firmas Espectrales. Confección de una figura de firma espectral por cada tipo de cobertura. @sec-firmas.
+3. Spectral Angle Mapper. Obtención de la clasificación del recorte a partir del SAM. @sec-sam.
+4. Principal Component Analysis. A partir de los píxeles de agua se obtienen los 3 componentes principales. @sec-pca.
+
+<!-- TODO: PRISMA: 2000-2500 p/SAM -->
+<!-- TODO: pca con el rango vnir únicamente -->
+<!-- TODO: pca para reducir la dimensionalidad -->
+
+Las imágenes hiperespectrales cuentan con una alta resolución espectral, permitiendo identificar con mayor precisión las coberturas presentes. PRISMA posee 63 bandas en el rango VNIR, obteniéndose firmas espectrales detalladas.
+
+# Obtención de Datos {#sec-datos}
+
+Los paquetes más relevantes son `{terra}` para el procesamiento de datos espaciales, `{tidyverse}` para generar figuras y procesamiento general, `{tidyterra}` que permite confeccionar mapas, `{prismaread}` para transformar el producto PRISMA y `{RStoolbox}` para análisis de sensado remoto.
+
+```{r}
+#| warning: false
+library(terra)
+library(tidyverse)
+library(tidyterra)
+```
+
+El producto PRISMA, nivel de procesamiento L2D en reflectancia de superficie, del 2022-03-11, se extrae y convierte de formato (`.he5` a `.tif`) para facilitar su lectura.
+
+Se elige que la totalidad del producto se convierta a `.tif`, existiendo la posibilidad de extraer el rango VNIR, el SWIR o ambos unidos.
+
+```{r}
+#| eval: false
+unzip(
+  "tp_prisma/PRS_L2D_STD_20220311142257_20220311142301_0001.zip",
+  exdir = "tp_prisma/"
+)
+
+prismaread::pr_convert(
+  in_file = "tp_prisma/PRS_L2D_STD_20220311142257_20220311142301_0001.he5",
+  out_folder = "tp_prisma/salida/",
+  out_format = "GTiff",
+  FULL = TRUE
+)
+```
+
+Además del ráster, se generan dos archivos de texto: `.ang` contiene datos de la geometría de adquisición y `.wvl` posee las longitudes de onda y la posición de cada banda espectral. Estos datos serán útiles para confeccionar firmas espectrales (@sec-firmas).
+
+Incorporo el ráster generado y el vector del Embalse San Roque, para luego recortar. Verifico la cantidad de bandas disponibles en el recorte.
+
+```{r}
+r_completo <- rast(
+  "tp_prisma/salida/PRS_L2D_STD_20220311142257_20220311142301_0001_HCO_FULL.tif"
+)
+v <- vect("tp_prisma/vectores/lago.geojson")
+
+r <- crop(r_completo, v)
+nlyr(r)
+```
+
+Leo el vector que contiene los sitios de muestreo para análisis de endmembers.
+
+```{r}
+p <- vect("tp_prisma/vectores/puntos.geojson")
+```
+
+Son cuatro sitios correspondientes a coberturas de suelo urbano, agua, algas y vegetación.
+
+Verifico creando un mapa RGB incluyendo los sitios. Las bandas del rojo, verde y azul corresponden con las capas 34, 20 y 10, respectivamente.
+
+```{r}
+#| label: fig-rgb
+#| fig-cap: Mapa RGB del Lago San Roque
+#| fig-cap-location: margin
+#| column: body-outset
+r_fecha <- varnames(r) |>
+  str_sub(13, 20) |>
+  ymd()
+
+ggplot() +
+  geom_spatraster_rgb(
+    data = r,
+    r = 34,
+    g = 20,
+    b = 10,
+    stretch = "lin"
+  ) +
+  geom_spatvector(data = p, shape = 21, fill = "red", color = "gold") +
+  geom_spatvector_label(
+    data = p,
+    aes(label = puntos),
+    size = 2,
+    vjust = -.25,
+    border.color = NA,
+    fill = "white"
+  ) +
+  labs(title = r_fecha, x = NULL, y = NULL) +
+  coord_sf(expand = FALSE) +
+  theme_minimal(base_size = 8) +
+  theme_sub_plot(background = element_blank()) +
+  theme_sub_panel(background = element_blank())
+```
+
+# Firmas espectrales {#sec-firmas}
+
+Primeramente, se leen las longitudes de onda de cada banda junto con el número de banda a partir del archivo de texto (`.wvl`) generado.
+
+```{r}
+wvl <- read_delim(
+  "tp_prisma/salida/PRS_L2D_STD_20220311142257_20220311142301_0001_HCO_FULL.wvl",
+  delim = " ",
+  show_col_types = FALSE
+) |>
+  rename(banda = band) |>
+  select(wl, banda)
+```
+
+Luego, se combina con las reflectancias de superficies extraídas del producto PRISMA. Se acomodan los datos y se conserva únicamente la etiqueta del sitio, el número de banda, la reflectancia de superficie y la longitud de onda (`wl`) en nm.
+
+```{r}
+reflect_tbl <- terra::extract(r, p, bind = TRUE) |>
+  as_tibble() |>
+  pivot_longer(
+    cols = starts_with("PRS_L2D_STD_"),
+    names_to = "banda",
+    values_to = "reflect"
+  ) |>
+  mutate(banda = str_extract(banda, "\\d+$")) |>
+  mutate(banda = as.numeric(banda)) |>
+  inner_join(wvl, by = join_by(banda)) |>
+  select(puntos, banda, reflect, wl)
+```
+
+```{r}
+#| echo: false
+#| tbl-cap: Reflectancias de superficie y longitudes de onda del producto PRISMA.
+#| tbl-cap-location: margin
+#| label: tbl-reflect
+gt::gt(head(reflect_tbl, 10)) |>
+  gt::fmt_number(decimals = 4, columns = "reflect") |>
+  gt::fmt_number(decimals = 1, columns = "wl") |>
+  gt_estilo()
+```
+
+Se grafica la firma espectral para identificar las diferencias entre los sitios seleccionados.
+
+```{r}
+#| fig-cap: Firmas espectrales de los sitios endmembers
+#| fig-cap-location: margin 
+#| label: fig-firma
+#| column: page-inset-right
+ggplot(reflect_tbl, aes(wl, reflect, group = puntos, color = puntos)) +
+  geom_line(linewidth = .5) +
+  scale_x_continuous(breaks = scales::breaks_width(200)) +
+  scale_color_brewer(palette = "Dark2") +
+  labs(x = "Long. de onda (nm)", y = "Reflect.", color = NULL) +
+  theme_bw() +
+  theme_sub_axis(text = element_text(color = "black")) +
+  theme_sub_panel(
+    grid.minor = element_blank(),
+    grid.major = element_line(linewidth = .1, color = "grey"),
+    background = element_blank()
+  ) +
+  theme_sub_strip(text = element_text(color = "black", face = "bold")) +
+  theme_sub_plot(background = element_blank(), margin = margin(r = 10)) +
+  theme_sub_legend(
+    position = "top",
+    key.spacing.x = unit(20, "pt"),
+    background = element_blank(),
+    text = element_text(margin = margin())
+  )
+```
+
+Las diferencias entre los cuatro sitios se hace evidente entre los rangos 400-1800 nm y entre 1950-2500 nm, donde las firmas espectrales se separan.
+
+# Spectral Angle Mapper (SAM) {#sec-sam}
+
+El análisis SAM el rango espectral entre los 400 y 1800 nm. Se calcula el ángulo de distancia en el espacio espectral para identificar los patrones de cobertura.
+
+Se identifican los números de bandas involucradas en el rango propuesto.
+
+```{r}
+banda_rango <- wvl |>
+  filter(between(wl, 400, 1800)) |>
+  pull(banda) |>
+  range()
+banda_rango
+```
+
+Se seleccionan las bandas comprendidas entre las posiciones `{r} banda_rango[1]` y `{r} banda_rango[2]`. Asimismo, conservo el mismo rango para las firmas espectrales.
+
+```{r}
+r_vnir <- r[[banda_rango[1]:banda_rango[2]]]
+reflect_vnir <- terra::extract(r_vnir, p)
+rownames(reflect_vnir) <- p$puntos
+```
+
+Cálculo del SAM y obtención de los valores de los ángulos de separación espectrales.
+
+```{r}
+lago_sam_ang <- RStoolbox::sam(r_vnir, reflect_vnir, angles = TRUE)
+```
+
+Verifico visualizando el raster obtenido. Cada panel muestra el ángulo de separación entre cada píxel del recorte y el endmember correspondiente. A menor ángulo (color rojo), más similitud.
+
+```{r}
+#| label: fig-sam-ang
+#| fig-cap: Ángulos SAM para cada endmember.
+#| fig-cap-location: margin
+#| column: page-inset-right
+plot(
+  lago_sam_ang,
+  nc = 2,
+  nr = 2,
+  axes = FALSE,
+  box = TRUE,
+  col = rev(viridis::magma(500))
+)
+```
+
+Es posible obtener la clasificación final de cada píxel del recorte, según los endmembers.
+
+```{r}
+lago_sam_clas <- RStoolbox::sam(r_vnir, reflect_vnir, angles = FALSE)
+```
+
+Inspección del resultado de la clasificación.
+
+```{r}
+#| label: fig-sam-clas
+#| fig-cap: Clasificación del recorte mediante SAM
+#| fig-cap-location: margin
+#| column: page-inset-right
+ggplot() +
+  geom_spatraster(data = lago_sam_clas) +
+  ggspatial::annotation_north_arrow(
+    location = "tr",
+    width = unit(20, "pt"),
+    height = unit(30, "pt")
+  ) +
+  ggspatial::annotation_scale(location = "bl", width_hint = .3) +
+  scale_fill_princess_c(
+    palette = "maori",
+    breaks = 1:4,
+    labels = p$puntos,
+    direction = -1,
+    guide = "legend"
+  ) +
+  labs(fill = NULL) +
+  coord_sf(expand = FALSE) +
+  labs(title = r_fecha) +
+  theme_minimal(base_size = 8) +
+  theme_sub_legend(
+    position = "top",
+    key.spacing.x = unit(20, "pt"),
+    text = element_text(margin = margin(l = 1))
+  ) +
+  theme_sub_panel(
+    background = element_rect(fill = "grey95"),
+    grid.major = element_line(linetype = 2, color = "grey80", linewidth = .3)
+  ) +
+  theme_sub_plot(background = element_blank()) +
+  theme_sub_axis_left(text = element_text(angle = 90, hjust = .5))
+```
+
+# Principal Component Analysis (PCA) {#sec-pca}
+
+El análisis PCA se aplica sobre los píxeles de agua para identificar los tres principales.
+
+Inicialmente, se calcula el MNDWI^[Modified Normalized Difference Water Index] @xuModificationNormalisedDifference2006 para conservar el agua en el recorte.
+
+```{r}
+mndwi <- (r[[34]] - r[[179]]) / (r[[34]] + r[[179]])
+m <- thresh(mndwi)
+m[isTRUE(m)] <- 1
+m[isFALSE(m)] <- NA
+m <- fillHoles(m)
+```
+
+Visualizo el recorte de agua para verificar.
+
+```{r}
+plot(m, col = "dodgerblue", axes = FALSE, box = TRUE, legend = FALSE)
+north(xy = "topleft")
+```
+
+Obtengo el PCA del recorte, indicando que el ráster se compongan de los tres componentes más relevantes.
+
+```{r}
+agua_pca <- m * r_vnir
+r_pca <- RStoolbox::rasterPCA(agua_pca, nComp = 3)
+```
+
+Visualizando por separado cada componente:
+
+```{r}
+plot(
+  r_pca$map,
+  col = viridis::magma(500),
+  axes = FALSE,
+  box = TRUE,
+  nc = 3,
+  nr = 1
+)
+```
+
+La visualización RGB de los tres componentes principales genera la siguiente figura.
+
+```{r}
+#| fig-cap: PCA combinados del Lago San Roque
+#| fig-cap-location: margin
+#| label: fig-pca-rgb
+plotRGB(stretch(r_pca$map), stretch = "lin")
+north(xy = "topleft")
+```
+
+Tomando el puntaje de los tres PCA más relevantes, la varianza acumulada alcanza el 75% del total:
+
+```{r}
+#| fig-cap: Aporte de los 3 PCA del Lago San Roque
+#| fig-cap-location: margin
+#| label: fig-pca-col
+r_pca$model$sdev |>
+  as_tibble() |>
+  mutate(pca = paste0("PC", row_number())) |>
+  mutate(pca = fct_inorder(pca)) |>
+  mutate(aporte = value / sum(value)) |>
+  slice_head(n = 3) |>
+  mutate(acumulado = cumsum(aporte)) |>
+  mutate(acumulado_label = paste0(round(acumulado * 100, 1), "%")) |>
+  ggplot(aes(pca, aporte, fill = pca)) +
+  geom_col() +
+  geom_line(aes(y = acumulado, group = 1)) +
+  geom_point(
+    aes(y = acumulado, fill = pca),
+    shape = 21,
+    size = 3,
+    stroke = 1,
+    color = "white"
+  ) +
+  geom_text(aes(y = acumulado, label = acumulado_label), vjust = -1) +
+  scale_y_continuous(
+    labels = scales::label_percent(),
+    breaks = scales::breaks_width(.1),
+    # limits = c(0, .8)
+  ) +
+  scale_fill_brewer(palette = "Dark2", guide = guide_none()) +
+  coord_cartesian(clip = "off") +
+  labs(x = NULL, y = "Aporte") +
+  theme_bw() +
+  theme_sub_axis(text = element_text(color = "black")) +
+  theme_sub_plot(background = element_blank()) +
+  theme_sub_panel(background = element_blank())
+```
+
+# Conclusión {.unnumbered #sec-conclusion}
+
+Técnicas como Spectral Angle Mapper y Principal Component Analysis resultan de utilidad durante el procesamiento de imágenes hiperespectrales.
+
+SAM logra aprovechar la alta resolución espectral de un producto PRISMA para clasificar su superficie a partir de puntos de referencia (endmembers). PCA es de utilidad para reducir la dimensionalidad del sistema y conservar nuevas y pocas variables relevantes.
+
+# Referencias {.unnumbered #sec-referencias}
+
+::: {#refs}
+:::
+
+::: {.callout-note collapse=true}
+
+## Detalle de paquetes empleados {#sec-detalle-paq}
+
+```{r}
+#| echo: false
+read.csv("versiones.csv") |>
+  gt::gt() |>
+  gt::fmt_url(columns = "url") |>
+  gt_estilo()
+```
+
+:::
