@@ -27,3 +27,10 @@ ipynb*
 tp_clorofila/*.rds
 *.ipynb
 *.csv
+ig/
+tp_clorofila/rasters/
+tp_clorofila/*yml
+tp_clorofila/*bib
+tp_clorofila/*csl
+tp_prisma/vectores/p.*
+tp_prisma/*yml
