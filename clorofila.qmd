@@ -7,9 +7,9 @@ format:
   html:
     embed-resources: true
     number-sections: true
-    brand: true
+    brand: extras/_brand.yml
     html-math-method: katex
-    bibliography: biblio_cla.bib
+    bibliography: extras/biblio_cla.bib
     csl: https://raw.githubusercontent.com/citation-style-language/styles/refs/heads/master/ieee.csl
     fig-dpi: 300
     toc: true
