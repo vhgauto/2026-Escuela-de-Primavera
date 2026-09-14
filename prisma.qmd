@@ -456,8 +456,7 @@ Obtengo el PCA del recorte, indicando que el ráster se compongan de los tres
 componentes más relevantes.
 
 ```{r}
-# agua_pca <- m * r_vnir
-agua_pca <- r_vnir
+agua_pca <- m * r_vnir
 r_pca <- RStoolbox::rasterPCA(agua_pca, nComp = 3)
 ```
 
