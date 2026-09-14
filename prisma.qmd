@@ -457,12 +457,15 @@ componentes más relevantes.
 
 ```{r}
 agua_pca <- m * r_vnir
-r_pca <- RStoolbox::rasterPCA(agua_pca, nComp = 3)
+r_pca <- RStoolbox::rasterPCA(agua_pca, nComp = 3, spca = TRUE)
 ```
 
 Visualizando por separado cada componente:
 
 ```{r}
+#| fig-cap: Distribución espacial de los tres componentes principales del recorte
+#| fig-cap-location: margin
+#| label: fig-pca-descomp
 plot(
   r_pca$map,
   col = viridis::magma(500),
@@ -481,45 +484,49 @@ figura.
 #| fig-cap-location: margin
 #| label: fig-pca-rgb
 
-plotRGB(stretch(r_pca$map), stretch = "lin", colNA = "transparent")
+plotRGB(stretch(r_pca$map), stretch = "lin", colNA = "#fafafa")
 north(xy = "topleft")
 ```
 
-Tomando el puntaje de los tres PCA más relevantes, la varianza acumulada alcanza
-el 75% del total:
+A partir del modelo se pueden extraer la varianza explicada por los tres componentes principales.
+
+```{r}
+acumulado_pca <- factoextra::get_eigenvalue(r_pca$model) |>
+  as_tibble(rownames = "dim") |>
+  slice_head(n = 3) |>
+  select(dim, var = variance.percent, acumulado = cumulative.variance.percent)
+acumulado_pca
+```
+
+```{r}
+gt::gt(acumulado_pca) |>
+  gt::fmt_percent(scale_values = FALSE, decimals = 1) |>
+  gt_estilo()
+```
+
+Con los primeros tres componentes se puede explicar el 86,7% del sistema. Visualizando queda:
 
 ```{r}
 #| fig-cap: Aporte de los 3 PCA del Lago San Roque
 #| fig-cap-location: margin
 #| label: fig-pca-col
 
-r_pca$model$sdev |>
-  as_tibble() |>
-  mutate(pca = paste0("PC", row_number())) |>
-  mutate(pca = fct_inorder(pca)) |>
-  mutate(aporte = value / sum(value)) |>
-  slice_head(n = 3) |>
-  mutate(acumulado = cumsum(aporte)) |>
-  mutate(acumulado_label = paste0(round(acumulado * 100, 1), "%")) |>
-  ggplot(aes(pca, aporte, fill = pca)) +
+acumulado_pca |>
+  mutate(acumulado_label = paste0(round(acumulado, 1), "%")) |>
+  ggplot(aes(dim, var, fill = dim)) +
   geom_col() +
   geom_line(aes(y = acumulado, group = 1)) +
   geom_point(
-    aes(y = acumulado, fill = pca),
+    aes(y = acumulado, fill = dim),
     shape = 21,
     size = 3,
     stroke = 1,
     color = "white"
   ) +
   geom_text(aes(y = acumulado, label = acumulado_label), vjust = -1) +
-  scale_y_continuous(
-    labels = scales::label_percent(),
-    breaks = scales::breaks_width(.1),
-    # limits = c(0, .8)
-  ) +
   scale_fill_brewer(palette = "Dark2", guide = guide_none()) +
   coord_cartesian(clip = "off") +
-  labs(x = NULL, y = "Aporte") +
+  labs(x = NULL, y = "Aporte (%)") +
   theme_bw() +
   theme_sub_axis(text = element_text(color = "black")) +
   theme_sub_plot(background = element_blank()) +
