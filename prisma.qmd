@@ -1,7 +1,7 @@
 ---
-title: "<b style='font-size: 2em;'>Hands-on: PRISMA Processing</b>"
+title: "<b style='font-size: 2em;'><span style='color: #b86092'>Hands-on:</span> PRISMA Processing</b>"
 subtitle: Escuela de Primavera 2026 - Instituto Gulich
-date: 2026-09-21
+date: 2026-09-22
 abstract: Procesamiento de imagen hiperespectral PRISMA y cálculo de *spectral
   angle mapper* y *principal component analysis*
 format: 
@@ -31,18 +31,20 @@ format:
         href: https://github.com/vhgauto/2026-Escuela-de-Primavera
     link-external-newwindow: true
 author: 
-  - name: Mgtr. Víctor Gauto
-    orcid: 0000-0001-9960-8558
-    corresponding: true
-    email: victor.gauto@ca.frre.utn.edu.ar
-    affiliation:
-      - name: GISTAQ
-        url: https://www.frre.utn.edu.ar/secretaria_de_ciencia_y_tecnologia/investigacion/GISTAQ/
   - name: Dra. Anabella Ferral
     affiliation:
       - name: Instituto Gulich
         url: https://ig.conae.unc.edu.ar/
     orcid: 0000-0002-9383-7728
+  - name: Mgtr. Víctor Gauto
+    orcid: 0000-0001-9960-8558
+    corresponding: true
+    email: victor.gauto@ca.frre.utn.edu.ar
+    affiliation:
+      - name: UTN-FRRE, GISTAQ
+        url: https://www.frre.utn.edu.ar/secretaria_de_ciencia_y_tecnologia/investigacion/GISTAQ/
+      - name: UNNE, IIDTHH
+        url: https://iidthh.conicet.gov.ar/
 execute: 
   echo: true
   eval: true
@@ -83,81 +85,38 @@ if (FALSE) {
 
 ## Misión PRISMA {.unnumbered}
 
-PRISMA es una misión satelital pre-operativa, que apunta poner a prueba la
-tecnología presente. Pretende realizar contribuciones en la generación de
-productos de uso académico y científico para el estudio del ambiente y manejo de
-riesgos @Meini2015. Se encuentra en órbita desde marzo de 2019 @Loizzo2018,
-contiene montados dos sensores en rango visible e infrarrojo, con una de
-resolución espacial de 30 m; y una banda pancromática (400-700 nm) de 5 m de
-resolución espacial. El rango espectral está comprendido entre los 400 a 2500
-nm, con 231 bandas espectrales.
+PRISMA es una misión satelital, que apunta poner a prueba la tecnología presente. Pretende realizar contribuciones en la generación de productos de uso académico y científico para el estudio del ambiente y manejo de riesgos @Meini2015. Se encuentra en órbita desde marzo de 2019 @Loizzo2018, contiene montados dos sensores en rango visible e infrarrojo, con una de resolución espacial de 30 m; y una banda pancromática (400-700 nm) de 5 m de resolución espacial. El rango espectral está comprendido entre los 400 a 2500 nm, con 231 bandas espectrales.
 
-Sus principales usos en investigación incluyen análisis de bosques, agricultura
-de precisión, cambio climático, estudios del ambiente y calidad del agua, como
-ser monitoreo de la concentración de clorofila-a o blooms algales @Loizzo2018.
-PRISMA ofrece productos a tope-de-atmósfera con pocas diferencias respecto de
-aquellos dados por Sentinel-2 @Giardino2020. Al comparar PRISMA con Sentinel-2,
-la calidad del agua estimada mediante PRISMA se corresponde adecuadamente con
-los resultados esperables @Niroumand-Jadidi2020. Incluso otras características
-del agua, como ser la concentración de ficocianina, puede obtenerse mediante los
-productos hiperespectrales PRISMA @OShea2021.
+Sus principales usos en investigación incluyen análisis de bosques, agricultura de precisión, cambio climático, estudios del ambiente y calidad del agua, como ser monitoreo de la concentración de clorofila-a o blooms algales @Loizzo2018. PRISMA ofrece productos a tope-de-atmósfera con pocas diferencias respecto de aquellos dados por Sentinel-2 @Giardino2020. Al comparar PRISMA con Sentinel-2, la calidad del agua estimada mediante PRISMA se corresponde adecuadamente con los resultados esperables @Niroumand-Jadidi2020. Incluso otras características del agua, como ser la concentración de ficocianina, puede obtenerse mediante los productos hiperespectrales PRISMA @OShea2021.
 
 ## Spectral Angle Mapper {.unnumbered}
 
-SAM es una técnica de clasificación basada en datos espectrales. Calcula un
-ángulo entre los píxeles de la región de interés y píxeles con un espectro de
-referencia (*endmembers*).
+SAM es una técnica de clasificación basada en datos espectrales los cuales son representados como vectores. Calcula el ángulo formado entre los píxeles de la región de interés y los píxeles de un espectro de referencia (*endmembers*).
 
-La similitud espectral se obtiene al calcular el ángulo entre firmas
-espectrales, como un vector $n$-dimensional, con $n$ siendo el número de bandas
-disponibles. Los productos hiperespectrales, al poseer gran número de bandas
-espectrales, ofrece gran detalle y permiten identificar coberturas similares.
+La similitud espectral se obtiene al calcular el ángulo entre firmas espectrales, como un vector $n$-dimensional, con $n$ siendo el número de bandas disponibles. Los productos hiperespectrales, al poseer gran número de bandas, ofrece gran detalle y permiten identificar diferentes coberturas.
 
-Ángulos bajos entre un píxel dado y un endmember indican un parecido espectral.
-Cuanto mayor es el ángulo, más diferentes son los espectros comparados.
+Ángulos bajos entre un píxel dado y un endmember indican un parecido espectral. Cuanto mayor es el ángulo, más diferentes son los espectros comparados. Generalmente el ángulo se representa como el valor de su coseno, entre 0 y 1.
 
 ## Principal Component Analysis {.unnumbered}
 
-PCA permite reducir la dimensionalidad de un sistema que posee gran número de
-variables. Se transforman los parámetros originales creando nuevos (`PC`),
-mediante transformaciones lineales.
+PCA permite reducir la dimensionalidad de un sistema que posee gran número de variables. Se transforman los parámetros originales creando nuevos (`PC`), mediante transformaciones lineales (rotación).
 
-La técnica PCA suele emplearse cuando las variables posee alta correlación
-lineal, por lo que se desea reducir la cantidad de parámetros disponibles.
+La técnica PCA suele emplearse cuando las variables poseen alta correlación lineal, por lo que se desea reducir la cantidad de parámetros disponibles.
 
-El primero componente principal (`PC1`) se construye al transformar linealmente
-las variables originales disponibles, que explica la mayor cantidad de varianza
-del sistema. `PC2`, por lo tanto, permite explicar la varianza restante (no
-explicada por `PC1`), luego de remover el efecto de `PC1`. Esto se repite tantas
-veces como bandas espectrales presentes, explicando en su totalidad el sistema
-de estudio.
+El primero componente principal (`PC1`) se construye al transformar linealmente las variables originales disponibles, que explica la mayor cantidad de varianza del sistema. `PC2`, por lo tanto, permite explicar la varianza restante (no explicada por `PC1`) al tratarse de vectores ortogonales, luego de remover el efecto de `PC1`. Esto se repite tantas veces como bandas espectrales presentes, explicando en su totalidad el sistema de estudio.
 
 ## Hoja de Ruta de la Práctica {.unnumbered}
 
-1. Obtención de Datos. Se convierte el producto PRISMA y se recorta a la región
-   de interés. A partir de un vector se extraen las firmas espectrales de los
-   endmembers. @sec-datos.
-2. Firmas Espectrales. Confección de una figura de firma espectral por cada tipo
-   de cobertura. @sec-firmas.
-3. Spectral Angle Mapper. Obtención de la clasificación del recorte a partir del
-   SAM. @sec-sam.
-4. Principal Component Analysis. A partir de los píxeles de agua se obtienen los
-   3 componentes principales. @sec-pca.
+1. Obtención de Datos. Se convierte el producto PRISMA y se recorta a la región de interés. A partir de un vector se extraen las firmas espectrales de los endmembers. @sec-datos.
+2. Firmas Espectrales. Confección de una figura de firma espectral por cada tipo de cobertura. @sec-firmas.
+3. Spectral Angle Mapper. Obtención de la clasificación del recorte. @sec-sam.
+4. Principal Component Analysis. A partir de los píxeles de agua se obtienen los 3 componentes principales. @sec-pca.
 
-<!-- TODO: PRISMA: 2000-2500 p/SAM -->
-<!-- TODO: pca con el rango vnir únicamente -->
-<!-- TODO: pca para reducir la dimensionalidad -->
-
-Las imágenes hiperespectrales cuentan con una alta resolución espectral,
-permitiendo identificar con mayor precisión las coberturas presentes. PRISMA
-posee 63 bandas en el rango VNIR, obteniéndose firmas espectrales detalladas.
+Las imágenes hiperespectrales cuentan con una alta resolución espectral, permitiendo identificar con mayor precisión las coberturas presentes. PRISMA posee 63 bandas en el rango VNIR, obteniéndose firmas espectrales detalladas.
 
 # Obtención de Datos {#sec-datos}
 
-Los paquetes más relevantes son `{terra}` para el procesamiento de datos
-espaciales, `{tidyverse}` para generar figuras y procesamiento general,
-`{tidyterra}` que permite confeccionar mapas, `{prismaread}` para transformar el
-producto PRISMA y `{RStoolbox}` para análisis de sensado remoto.
+Los paquetes más relevantes son `{terra}` para el procesamiento de datos espaciales, `{tidyverse}` para generar figuras y procesamiento general, `{tidyterra}` que permite confeccionar mapas, `{prismaread}` para transformar el producto PRISMA y `{RStoolbox}` para análisis de sensado remoto.
 
 ```{r}
 #| warning: false
@@ -167,12 +126,9 @@ library(tidyverse)
 library(tidyterra)
 ```
 
-El producto PRISMA, nivel de procesamiento L2D en reflectancia de superficie,
-del 2022-03-11, se extrae y convierte de formato (`.he5` a `.tif`) para
-facilitar su lectura.
+El producto PRISMA, nivel de procesamiento L2D en reflectancia de superficie, del 2022-03-11, se extrae y convierte de formato (`.he5` a `.tif`) para facilitar su lectura.
 
-Se elige que la totalidad del producto se convierta a `.tif`, existiendo la
-posibilidad de extraer el rango VNIR, el SWIR o ambos unidos.
+Se elige que la totalidad del producto se convierta a `.tif`, existiendo la posibilidad de extraer el rango VNIR, el SWIR o ambos unidos.
 
 ```{r}
 #| eval: false
@@ -190,30 +146,24 @@ prismaread::pr_convert(
 )
 ```
 
-Además del ráster, se generan dos archivos de texto: `.ang` contiene datos de la
-geometría de adquisición y `.wvl` posee las longitudes de onda y la posición de
-cada banda espectral. Estos datos serán útiles para confeccionar firmas
-espectrales (@sec-firmas).
+Además del ráster, se generan dos archivos de texto: `.ang` contiene datos de la geometría de adquisición y `.wvl` posee las longitudes de onda (ancho y centro de banda) la posición de cada banda espectral. Estos datos serán útiles para confeccionar firmas espectrales (@sec-firmas).
 
-Leo el recorte creado a partir de un vector alrededor del Embalse San Roque y
-verifico la cantidad de bandas disponibles.
+Leo el recorte creado a partir de un vector alrededor del Embalse San Roque y verifico la cantidad de bandas disponibles.
 
 ```{r}
 r <- rast("tp_prisma/salida/20220311.tif")
 nlyr(r)
 ```
 
-Leo el vector que contiene los sitios de muestreo para análisis de endmembers.
+Se lee el vector que contiene los sitios de muestreo para análisis de endmembers.
 
 ```{r}
 p <- vect("tp_prisma/vectores/puntos.geojson")
 ```
 
-Son cuatro sitios correspondientes a coberturas de suelo urbano, agua, algas y
-vegetación.
+Son cuatro sitios correspondientes a coberturas de suelo urbano, agua, algas y vegetación.
 
-Verifico creando un mapa RGB incluyendo los sitios. Las bandas del rojo, verde y
-azul corresponden con las capas 34, 20 y 10, respectivamente.
+Verifico creando un mapa RGB incluyendo los sitios. Las bandas del rojo, verde y azul corresponden con las capas 34, 20 y 10, respectivamente.
 
 ```{r}
 #| label: fig-rgb
@@ -251,8 +201,7 @@ ggplot() +
 
 # Firmas espectrales {#sec-firmas}
 
-Primeramente, se leen las longitudes de onda de cada banda junto con el número
-de banda a partir del archivo de texto (`.wvl`) generado.
+Primeramente, se leen las longitudes de onda de cada banda junto con el número de banda a partir del archivo de texto (`.wvl`) generado.
 
 ```{r}
 wvl <- read_delim(
@@ -264,10 +213,7 @@ wvl <- read_delim(
   select(wl, banda)
 ```
 
-Luego, se combina con las reflectancias de superficies extraídas del producto
-PRISMA. Se acomodan los datos y se conserva únicamente la etiqueta del sitio, el
-número de banda, la reflectancia de superficie y la longitud de onda (`wl`) en
-nm.
+Luego, se combina con las reflectancias de superficies extraídas del producto PRISMA. Se acomodan los datos y se conserva únicamente la etiqueta del sitio, el número de banda, la reflectancia de superficie y la longitud de onda (`wl`) en nm.
 
 ```{r}
 reflect_tbl <- terra::extract(r, p, bind = TRUE) |>
@@ -285,8 +231,7 @@ reflect_tbl <- terra::extract(r, p, bind = TRUE) |>
 
 ```{r}
 #| echo: false
-#| tbl-cap: Reflectancias de superficie y longitudes de onda del producto
-#|   PRISMA.
+#| tbl-cap: Reflectancias de superficie y longitudes de onda del producto PRISMA.
 #| tbl-cap-location: margin
 #| label: tbl-reflect
 
@@ -296,8 +241,7 @@ gt::gt(head(reflect_tbl, 10)) |>
   gt_estilo()
 ```
 
-Se grafica la firma espectral para identificar las diferencias entre los sitios
-seleccionados.
+Se grafica la firma espectral para identificar las diferencias entre los sitios seleccionados.
 
 ```{r}
 #| fig-cap: Firmas espectrales de los sitios endmembers
@@ -327,13 +271,11 @@ ggplot(reflect_tbl, aes(wl, reflect, group = puntos, color = puntos)) +
   )
 ```
 
-Las diferencias entre los cuatro sitios se hace evidente entre los rangos
-400-1800 nm y entre 1950-2500 nm, donde las firmas espectrales se separan.
+Las diferencias entre los cuatro sitios se hace evidente entre los rangos 400-1800 nm y entre 1950-2500 nm, donde las firmas espectrales se separan.
 
 # Spectral Angle Mapper (SAM) {#sec-sam}
 
-El análisis SAM el rango espectral entre los 400 y 1800 nm. Se calcula el ángulo
-de distancia en el espacio espectral para identificar los patrones de cobertura.
+Para el análisis SAM se hace uso del rango espectral entre 400 y 1800 nm. Se calcula el ángulo de distancia en el espacio espectral para identificar los patrones de cobertura.
 
 Se identifican los números de bandas involucradas en el rango propuesto.
 
@@ -345,26 +287,21 @@ banda_rango <- wvl |>
 banda_rango
 ```
 
-Se seleccionan las bandas comprendidas entre las posiciones `{r} banda_rango[1]`
-y `{r} banda_rango[2]`. Asimismo, conservo el mismo rango para las firmas
-espectrales.
+Se seleccionan las bandas comprendidas entre las posiciones `{r} banda_rango[1]` y `{r} banda_rango[2]`. Asimismo, conservo el mismo rango para las firmas espectrales.
 
 ```{r}
-r_vnir <- r[[banda_rango[1]:banda_rango[2]]]
-reflect_vnir <- terra::extract(r_vnir, p)
+r_rango <- r[[banda_rango[1]:banda_rango[2]]]
+reflect_vnir <- terra::extract(r_rango, p)
 rownames(reflect_vnir) <- p$puntos
 ```
 
-Cálculo del SAM y obtención de los valores de los ángulos de separación
-espectrales.
+Cálculo del SAM y obtención de los valores de los ángulos de separación espectrales.
 
 ```{r}
-lago_sam_ang <- RStoolbox::sam(r_vnir, reflect_vnir, angles = TRUE)
+lago_sam_ang <- RStoolbox::sam(r_rango, reflect_vnir, angles = TRUE)
 ```
 
-Verifico visualizando el raster obtenido. Cada panel muestra el ángulo de
-separación entre cada píxel del recorte y el endmember correspondiente. A menor
-ángulo (color rojo), más similitud.
+Verifico visualizando el raster obtenido. Cada panel muestra el ángulo de separación entre cada píxel del recorte y el endmember correspondiente. A menor ángulo (color rojo), más similitud.
 
 ```{r}
 #| label: fig-sam-ang
@@ -382,11 +319,10 @@ plot(
 )
 ```
 
-Es posible obtener la clasificación final de cada píxel del recorte, según los
-endmembers.
+Es posible obtener la clasificación final de cada píxel del recorte, según los endmembers.
 
 ```{r}
-lago_sam_clas <- RStoolbox::sam(r_vnir, reflect_vnir, angles = FALSE)
+lago_sam_clas <- RStoolbox::sam(r_rango, reflect_vnir, angles = FALSE)
 ```
 
 Inspección del resultado de la clasificación.
@@ -400,11 +336,11 @@ Inspección del resultado de la clasificación.
 ggplot() +
   geom_spatraster(data = lago_sam_clas) +
   ggspatial::annotation_north_arrow(
-    location = "tr",
+    location = "tl",
     width = unit(20, "pt"),
     height = unit(30, "pt")
   ) +
-  ggspatial::annotation_scale(location = "bl", width_hint = .3) +
+  ggspatial::annotation_scale(location = "br", width_hint = .3) +
   scale_fill_princess_c(
     palette = "maori",
     breaks = 1:4,
@@ -431,11 +367,9 @@ ggplot() +
 
 # Principal Component Analysis (PCA) {#sec-pca}
 
-El análisis PCA se aplica sobre los píxeles de agua para identificar los tres
-principales.
+El análisis PCA se aplica sobre los píxeles de agua para identificar los tres principales.
 
-Inicialmente, se calcula el MNDWI^[Modified Normalized Difference Water Index]
-@xuModificationNormalisedDifference2006 para conservar el agua en el recorte.
+Inicialmente, se calcula el MNDWI^[Modified Normalized Difference Water Index] @xuModificationNormalisedDifference2006 para conservar el agua en el recorte.
 
 ```{r}
 mndwi <- (r[[34]] - r[[179]]) / (r[[34]] + r[[179]])
@@ -452,11 +386,10 @@ plot(m, col = "dodgerblue", axes = FALSE, box = TRUE, legend = FALSE)
 north(xy = "topleft")
 ```
 
-Obtengo el PCA del recorte, indicando que el ráster se compongan de los tres
-componentes más relevantes.
+Obtengo el PCA del recorte, indicando que el ráster de salida se compongan de los tres componentes más relevantes.
 
 ```{r}
-agua_pca <- m * r_vnir
+agua_pca <- m * r_rango
 r_pca <- RStoolbox::rasterPCA(agua_pca, nComp = 3, spca = TRUE)
 ```
 
@@ -476,21 +409,21 @@ plot(
 )
 ```
 
-La visualización RGB de los tres componentes principales genera la siguiente
-figura.
+La visualización RGB de los tres componentes principales genera la siguiente figura.
 
 ```{r}
 #| fig-cap: PCA combinados del Lago San Roque
 #| fig-cap-location: margin
 #| label: fig-pca-rgb
 
-plotRGB(stretch(r_pca$map), stretch = "lin", colNA = "#fafafa")
+plotRGB(stretch(r_pca$map), colNA = "#fafafa", stretch = "lin")
 north(xy = "topleft")
 ```
 
 A partir del modelo se pueden extraer la varianza explicada por los tres componentes principales.
 
 ```{r}
+#| output: false
 acumulado_pca <- factoextra::get_eigenvalue(r_pca$model) |>
   as_tibble(rownames = "dim") |>
   slice_head(n = 3) |>
@@ -499,12 +432,16 @@ acumulado_pca
 ```
 
 ```{r}
+#| echo: false
+#| tbl-cap: Porcentaje acumulado de los tres componentes principales.
+#| tbl-cap-location: margin
+#| label: tbl-pca-acumulado
 gt::gt(acumulado_pca) |>
   gt::fmt_percent(scale_values = FALSE, decimals = 1) |>
   gt_estilo()
 ```
 
-Con los primeros tres componentes se puede explicar el 86,7% del sistema. Visualizando queda:
+Con los primeros tres componentes se puede explicar el `{r} round(max(acumulado_pca$acumulado), 1)`% del sistema. Visualizando queda:
 
 ```{r}
 #| fig-cap: Aporte de los 3 PCA del Lago San Roque
@@ -513,8 +450,8 @@ Con los primeros tres componentes se puede explicar el 86,7% del sistema. Visual
 
 acumulado_pca |>
   mutate(acumulado_label = paste0(round(acumulado, 1), "%")) |>
-  ggplot(aes(dim, var, fill = dim)) +
-  geom_col() +
+  ggplot(aes(x = dim, fill = dim)) +
+  geom_col(aes(y = var)) +
   geom_line(aes(y = acumulado, group = 1)) +
   geom_point(
     aes(y = acumulado, fill = dim),
@@ -524,8 +461,9 @@ acumulado_pca |>
     color = "white"
   ) +
   geom_text(aes(y = acumulado, label = acumulado_label), vjust = -1) +
+  scale_y_continuous(breaks = scales::breaks_width(10)) +
   scale_fill_brewer(palette = "Dark2", guide = guide_none()) +
-  coord_cartesian(clip = "off") +
+  coord_cartesian(clip = "off", ylim = c(0, 100)) +
   labs(x = NULL, y = "Aporte (%)") +
   theme_bw() +
   theme_sub_axis(text = element_text(color = "black")) +
@@ -535,13 +473,9 @@ acumulado_pca |>
 
 # Conclusión {#sec-conclusion .unnumbered}
 
-Técnicas como Spectral Angle Mapper y Principal Component Analysis resultan de
-utilidad durante el procesamiento de imágenes hiperespectrales.
+Técnicas como Spectral Angle Mapper y Principal Component Analysis resultan de utilidad durante el procesamiento de imágenes hiperespectrales.
 
-SAM logra aprovechar la alta resolución espectral de un producto PRISMA para
-clasificar su superficie a partir de puntos de referencia (endmembers). PCA es
-de utilidad para reducir la dimensionalidad del sistema y conservar nuevas y
-pocas variables relevantes.
+SAM logra aprovechar la alta resolución espectral de un producto PRISMA para clasificar su superficie a partir de puntos de referencia (endmembers). PCA es de utilidad para reducir la dimensionalidad del sistema y crear nuevas y pocas variables relevantes.
 
 # Referencias {#sec-referencias .unnumbered}
 

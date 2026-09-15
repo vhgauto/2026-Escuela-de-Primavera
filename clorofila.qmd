@@ -1,12 +1,9 @@
 ---
 title: >-
-  <b style='font-size: 2em;'>Hands-on: Semi-empirical Algorithms and
-  Water
- Quality Indicator Modelling</b>
+  <b style='font-size: 2em;'><span style='color: #b86092'>Hands-on:</span> Semi-empirical Algorithms and Water Quality Indicator Modelling</b>
 subtitle: Escuela de Primavera 2026 - Instituto Gulich
 date: 2026-09-21
-abstract: Modelización de clorofila-a en el Embalse San Roque a partir de
-  muestreos de campo y productos Landsat-8/9
+abstract: Modelización de clorofila-a en el Embalse San Roque a partir de muestreos de campo y productos Landsat-8/9
 format: 
   html:
     embed-resources: true
@@ -33,13 +30,6 @@ format:
         href: https://github.com/vhgauto/2026-Escuela-de-Primavera
     link-external-newwindow: true
 author: 
-  - name: Mgtr. Víctor Gauto
-    orcid: 0000-0001-9960-8558
-    corresponding: true
-    email: victor.gauto@ca.frre.utn.edu.ar
-    affiliation:
-      - name: GISTAQ
-        url: https://www.frre.utn.edu.ar/secretaria_de_ciencia_y_tecnologia/investigacion/GISTAQ/
   - name: Dra. Anabella Ferral
     affiliation:
       - name: Instituto Gulich
@@ -50,6 +40,15 @@ author:
       - name: Instituto Gulich
         url: https://ig.conae.unc.edu.ar/
     orcid: 0000-0002-7698-7927
+  - name: Mgtr. Víctor Gauto
+    orcid: 0000-0001-9960-8558
+    corresponding: true
+    email: victor.gauto@ca.frre.utn.edu.ar
+    affiliation:
+      - name: UTN-FRRE, GISTAQ
+        url: https://www.frre.utn.edu.ar/secretaria_de_ciencia_y_tecnologia/investigacion/GISTAQ/
+      - name: UNNE, IIDTHH
+        url: https://iidthh.conicet.gov.ar/
 execute: 
   echo: true
   eval: true
@@ -88,134 +87,60 @@ gt_estilo <- function(TABLA) {
 
 ## Área de Estudio y la Importancia de la Clorofila-a {.unnumbered}
 
-El Embalse San Roque es un cuerpo de agua emblemático de la provincia de
-Córdoba. Constituye la principal fuente de abastecimiento de agua potable para
-aproximadamente el 70% de la población de la ciudad de Córdoba y áreas aledañas,
-es decir, más de 1,5 millones de habitantes, además de ser un nodo clave para la
-recreación y el turismo regional. Su estado ambiental, caracterizado por
-recurrentes floraciones algales y de cianobacterias, motivó un histórico fallo
-judicial para la implementación de un plan de saneamiento con el fin de mitigar
-la eutrofización del embalse gestionado por la Provincia y los municipios de la
-cuenca.
+El Embalse San Roque es un cuerpo de agua emblemático de la provincia de Córdoba. Constituye la principal fuente de abastecimiento de agua potable para aproximadamente el 70% de la población de la ciudad de Córdoba y áreas aledañas, es decir, más de 1,5 millones de habitantes, además de ser un nodo clave para la recreación y el turismo regional. Su estado ambiental, caracterizado por recurrentes floraciones algales y de cianobacterias, motivó un histórico fallo judicial para la implementación de un plan de saneamiento con el fin de mitigar la eutrofización del embalse gestionado por la Provincia y los municipios de la cuenca.
 
-La Clorofila-a (`cla`) es el principal pigmento fotosintético del fitoplancton y
-actúa como un indicador clave del estado trófico y de la calidad del agua.
-Monitorear su concentración permite detectar procesos de eutrofización y blooms
-algales. La teledetección satelital complementa los muestreos de campo
-tradicionales, permitiendo generar mapas continuos de `cla` sobre todo el
-embalse y sentar las bases para análisis de series temporales y modelos
-predictivos de regresión.
+La Clorofila-a (`cla`) es el principal pigmento fotosintético del fitoplancton y actúa como un indicador clave del estado trófico y de la calidad del agua. Monitorear su concentración permite detectar procesos de eutrofización y blooms algales. La teledetección satelital complementa los muestreos de campo tradicionales, permitiendo generar mapas continuos de `cla` sobre todo el embalse y sentar las bases para análisis de series temporales y modelos predictivos de regresión.
 
 ## Objetivo del Práctico {.unnumbered}
 
-El objetivo principal de este práctico es proponer, entrenar, comparar,
-seleccionar y validar modelos para estimar la concentración de Clorofila-a en el
-Embalse San Roque, integrando datos de reflectancia espectral de los satélites
-Landsat-8/9 con mediciones de campo in situ. Al finalizar la sesión, obtendrás
-un algoritmo validado capaz de generar un mapa de distribución espacial de
-concentración de Clorofila-a sobre la totalidad del cuerpo de agua.
+El objetivo principal de este práctico es proponer, entrenar, comparar, seleccionar y validar modelos para estimar la concentración de Clorofila-a en el Embalse San Roque, integrando datos de reflectancia espectral de los satélites Landsat-8/9 con mediciones de campo in situ. Al finalizar la sesión, obtendrás un algoritmo validado capaz de generar un mapa de distribución espacial de concentración de Clorofila-a sobre la totalidad del cuerpo de agua.
 
 ## Datos de Insumo y Preprocesamiento {.unnumbered}
 
 En este práctico integraremos dos fuentes de datos principales:
 
-- Mediciones in situ: Mediciones de `cla` (en μg/L) obtenidas en campo mediante
-  una sonda fluorométrica, registradas con su ubicación geográfica y fecha.
+- Mediciones in situ: Mediciones de `cla` (en μg/L) obtenidas en campo mediante una sonda fluorométrica, registradas con su ubicación geográfica y fecha.
+- Datos Satelitales: Datos de reflectancia de superficie (L2) de los sensores OLI/OLI-2 a bordo de las misiones Landsat 8 y 9, corregidas atmosféricamente, de acceso libre y gratuito en [https://earthexplorer.usgs.gov/](https://earthexplorer.usgs.gov/).
 
-- Datos Satelitales: Datos de reflectancia de superficie (L2) de los sensores
-  OLI/OLI-2 a bordo de las misiones Landsat 8 y 9, corregidas atmosféricamente,
-  de acceso libre y gratuito en
-  [https://earthexplorer.usgs.gov/](https://earthexplorer.usgs.gov/).
-
-Flujo de trabajo, lectura y extracción de datos: se extraen los valores de píxel
-de los ráster en reflectancia de superficie^[Los valores de píxel del producto
-satelital ($DN$) deben ser rescalados considerando los factores multiplicativo
-$2.75e - 5$ y aditivo $-0.2$, restultando: $reflect = DN * 2.75e^{-5} - 0.2$]
-mediante un vector de puntos, conteniendo las coordenadas de los sitios de
-muestreo fijos. Las reflectancias se combinan con los datos de clorofila, por
-fecha y sitio, contenidos en un archivo de texto (`.csv`), obteniendo una tabla
-final con datos de `cla` y reflectancias de cada banda espectral como insumo
-para la modelización.
+Flujo de trabajo, lectura y extracción de datos: se extraen los valores de píxel de los ráster en reflectancia de superficie^[Los valores de píxel del producto satelital ($DN$) deben ser rescalados considerando los factores multiplicativo $2.75e - 5$ y aditivo $-0.2$, restultando: $reflect = DN * 2.75e^{-5} - 0.2$] mediante un vector de puntos, conteniendo las coordenadas de los sitios de muestreo fijos. Las reflectancias se combinan con los datos de clorofila, por fecha y sitio, contenidos en un archivo de texto (`.csv`), obteniendo una tabla final con datos de `cla` y reflectancias de cada banda espectral como insumo para la modelización.
 
 ## Estrategia de Modelado: Entrenamiento, Validación y Bootstrapping {.unnumbered}
 
-En este práctico, la variable de interés a ser estimada es la clorofila-a
-(`cla`), tomando las bandas espectrales (`B1` a `B7`) e índices creados a partir
-de combinaciones entre las mismas, como variables explicativas.
+En este práctico, la variable de interés a ser estimada es la clorofila-a (`cla`), tomando las bandas espectrales (`B1` a `B7`) e índices creados a partir de combinaciones entre las mismas, como variables explicativas.
 
-Para contribuir a la robustez estadística del modelo, dividiremos aleatoriamente
-la base de datos en dos subconjuntos diferentes: Entrenamiento (75%) y
-Validación (25%). Esta separación es fundamental: validar el algoritmo con un
-conjunto de datos independiente es la única forma objetiva de medir su verdadera
-capacidad de generalización y, en el caso de los modelos de machine learning,
-evitar el sobreajuste, donde el modelo memoriza el ruido local pero falla al
-estimar la variable de interés con nuevos datos.
+Para contribuir a la robustez estadística del modelo, dividiremos aleatoriamente la base de datos en dos subconjuntos diferentes: Entrenamiento (75%) y Validación (25%). Esta separación es fundamental: validar el algoritmo con un conjunto de datos independiente es la única forma objetiva de medir su verdadera capacidad de generalización y, en el caso de los modelos de machine learning, evitar el sobreajuste, donde el modelo memoriza el ruido local pero falla al estimar la variable de interés con nuevos datos.
 
-Frente a las limitaciones logísticas, climáticas y económicas que restringen la
-frecuencia de los monitoreos in situ, aplicaremos la técnica de Bootstrapping
-sobre el conjunto de entrenamiento. Mediante la generación de múltiples
-submuestras con reemplazo que conservan la distribución estadística original,
-esta metodología amplía la representatividad de la base de datos, incrementa la
-estabilidad del algoritmo y mitiga la sensibilidad frente a valores atípicos
-(outliers).
+Frente a las limitaciones logísticas, climáticas y económicas que restringen la frecuencia de los monitoreos in situ, aplicaremos la técnica de Bootstrapping sobre el conjunto de entrenamiento. Mediante la generación de múltiples submuestras con reemplazo que conservan la distribución estadística original, esta metodología amplía la representatividad de la base de datos, incrementa la estabilidad del algoritmo y mitiga la sensibilidad frente a valores atípicos (outliers).
 
 ## Dos Enfoques Metodológicos: Tradicional vs. Machine Learning {.unnumbered}
 
 En este práctico evaluaremos y compararemos dos métodos de modelado:
 
-- Enfoque Tradicional (Modelos Semiempíricos): Seleccionaremos combinaciones e
-  índices de bandas que posean un sentido físico y bio-óptico claro, basados en
-  las regiones de absorción y dispersión de la clorofila-a en el espectro
-  electromagnético, ajustados mediante regresiones lineales simples o múltiples.
+- Enfoque Tradicional (Modelos Semiempíricos): Seleccionaremos combinaciones e índices de bandas que posean un sentido físico y bio-óptico claro, basados en las regiones de absorción y dispersión de la clorofila-a en el espectro electromagnético, ajustados mediante regresiones lineales simples o múltiples.
 
-- Aprendizaje Automático (Machine Learning): Las técnicas de ML han cobrado gran
-  relevancia por su capacidad para caracterizar aguas ópticamente complejas.
-  Utilizaremos **Random Forest** (RF), un algoritmo de ensamble de árboles de
-  decisión capaz de capturar relaciones no lineales complejas sin asumir
-  distribuciones previas. RF minimiza el sobreajuste mediante una selección
-  aleatoria de variables y muestras. Además, se pueden aplicar técnicas que nos
-  ayudan a interpretar un modelo ML a partir del grado de participación de las
-  variables predictoras.
+- Aprendizaje Automático (Machine Learning): Las técnicas de ML han cobrado gran relevancia por su capacidad para caracterizar aguas ópticamente complejas. Utilizaremos **Random Forest** (RF), un algoritmo de ensamble de árboles de decisión capaz de capturar relaciones no lineales complejas sin asumir distribuciones previas. RF minimiza el sobreajuste mediante una selección aleatoria de variables y muestras. Además, se pueden aplicar técnicas que nos ayudan a interpretar un modelo ML a partir del grado de participación de las variables predictoras.
 
 ## Hoja de Ruta de la Práctica {.unnumbered}
 
-A lo largo de esta clase, avanzaremos paso a paso a través de las siguientes
-etapas:
+A lo largo de esta clase, avanzaremos paso a paso a través de las siguientes etapas:
 
-1. Preprocesamiento: Lectura de los ráster, extracción de los valores de
-   reflectancia en los sitios de interés, lectura de datos in situ de `cla` y su
-   combinación en una única tabla de datos. @sec-prepro.
-2. Correlaciones: Cálculo del coeficiente de correlación lineal de Pearson (`r`)
-   entre `cla` y las bandas espectrales e índices. @sec-corr.
-3. División de Datos: Creación de los conjuntos de entrenamiento (75%) y
-   validación (25%). @sec-division.
-4. Re-muestreo: Aplicación de Bootstrapping sobre el conjunto de entrenamiento
-   para otorgar estabilidad estadística. @sec-remuestreo.
-5. Construcción de Modelos. @sec-construc-mod:
-   1. Mecanismos de los modelos, donde se definen el modelo lineal y el RF.
-      @sec-modelos.
-   2. Recetas, que relacionan `cla` con las variables explicativas.
-      @sec-recetas.
-   3. Workflow, para unir recetas y modelos. @sec-workflow.
-6. Entrenamiento: Optimización del número de árboles (`trees`) y entrenamiento
-   de los modelos propuestos. @sec-entrenamiento.
-7. Selección del modelo: Comparación entre las métricas de desempeño de los
-   algoritmos entrenados. @sec-seleccion.
-8. Validación: Último ajuste del modelo elegido con los datos de validación,
-   cálculo de las métricas de desempeño finales y la comparación entre datos
-   medidos y estimados. @sec-validacion.
-9. Mapa: Aplicación del algoritmo desarrollado a un recorte del Embalse San
-   Roque. @sec-mapa.
-10. Explicabilidad de RF: Aplicación del método de importancia global de
-    variables para identificar las bandas que más aportan al algoritmo.
-    @sec-explicabilidad.
+1. Preprocesamiento: Lectura de los ráster, extracción de los valores de reflectancia en los sitios de interés, lectura de datos in situ de `cla` y su combinación en una única tabla de datos. @sec-prepro.
+2. Correlaciones: Cálculo del coeficiente de correlación lineal de Pearson (`r`) entre `cla` y las bandas espectrales e índices. @sec-corr.
+3. División de Datos: Creación de los conjuntos de entrenamiento (75%) y validación (25%). @sec-division.
+4. Re-muestreo: Aplicación de Bootstrapping sobre el conjunto de entrenamiento para otorgar estabilidad estadística. @sec-remuestreo.
+5. Construcción de Modelos. @sec-construc-mod: 
+    1. Mecanismos de los modelos, donde se definen el modelo lineal y el RF. @sec-modelos.
+    2. Recetas, que relacionan `cla` con las variables explicativas. @sec-recetas.
+    3. Workflow, para unir recetas y modelos. @sec-workflow.
+6. Entrenamiento: Optimización del número de árboles (`trees`) y entrenamiento de los modelos propuestos. @sec-entrenamiento.
+7. Selección del modelo: Comparación entre las métricas de desempeño de los algoritmos entrenados. @sec-seleccion.
+8. Validación: Último ajuste del modelo elegido con los datos de validación, cálculo de las métricas de desempeño finales y la comparación entre datos medidos y estimados. @sec-validacion.
+9. Mapa: Aplicación del algoritmo desarrollado a un recorte del Embalse San Roque. @sec-mapa.
+10. Explicabilidad de RF: Aplicación del método de importancia global de variables para identificar las bandas que más aportan al algoritmo. @sec-explicabilidad.
 
 # Preprocesamiento {#sec-prepro}
 
-Los paquetes principales son `{terra}` para el procesamiento de datos espaciales
-(rásters y vectores), `{tidyterra}` facilita la confección de mapas,
-`{tidymodels}` brinda una metodología de trabajo para la modelización y
-`{tidyverse}` contiene una colección de paquetes para ciencia de datos.
+Los paquetes principales son `{terra}` para el procesamiento de datos espaciales (rásters y vectores), `{tidyterra}` facilita la confección de mapas, `{tidymodels}` brinda una metodología de trabajo para la modelización y `{tidyverse}` contiene una colección de paquetes para ciencia de datos.
 
 ```{r}
 #| warning: false
@@ -241,8 +166,7 @@ Leo el vector de puntos de muestreo.
 p <- vect("tp_clorofila/vectores/puntos.geojson")
 ```
 
-Visualizo una de las fechas para verificar la correcta lectura de los datos, con
-los sitios de muestreo y sus nombres.
+Visualizo una de las fechas para verificar la correcta lectura de los datos, con los sitios de muestreo y sus nombres.
 
 ```{r}
 #| label: fig-rgb
@@ -279,18 +203,13 @@ ggplot() +
   theme_sub_panel(background = element_blank())
 ```
 
-Como puede observarse, el sitio `GAR` se encuentra en una región estrecha del
-San Roque (@fig-rgb), por lo que se lo remueve y no será considerado en la etapa
-de modelización.
+Como puede observarse, el sitio `GAR` se encuentra en una región estrecha del San Roque (@fig-rgb), por lo que se lo remueve y no será considerado en la etapa de modelización.
 
 ```{r}
 p <- p[p$sitio != "GAR"]
 ```
 
-A partir de los sitios y los ráster, se extraen las reflectancias de superficie
-de todos los recortes disponibles. Para facilitar la extracción de los valores
-de píxel, se crea la función `f_reflect` y se la aplica a cada elemento de la
-lista de recortes.
+A partir de los sitios y los ráster, se extraen las reflectancias de superficie de todos los recortes disponibles. Para facilitar la extracción de los valores de píxel, se crea la función `f_reflect` y se la aplica a cada elemento de la lista de recortes.
 
 ```{r}
 f_reflect <- function(i) {
@@ -315,8 +234,7 @@ gt::gt(head(reflect_tbl, 10)) |>
   gt_estilo()
 ```
 
-Los datos de clorofila-a provienen de un archivo de texto (`.csv`) que contiene
-la fecha de muestreo, el nombre del sitio y la medición en μg/l.
+Los datos de clorofila-a provienen de un archivo de texto (`.csv`) que contiene la fecha de muestreo, el nombre del sitio y la medición en μg/l.
 
 ```{r}
 #| warning: false
@@ -335,9 +253,7 @@ gt::gt(head(cla_tbl, 10)) |>
   gt_estilo()
 ```
 
-Finalmente, se combinan los datos espectrales con las mediciones de `cla`, a
-partir del nombre del sitio y la fecha. Para la modelización se seleccionan
-únicamente las bandas y el valor de `cla`.
+Finalmente, se combinan los datos espectrales con las mediciones de `cla`, a partir del nombre del sitio y la fecha. Para la modelización se seleccionan únicamente las bandas y el valor de `cla`.
 
 ```{r}
 reflect_cla <- inner_join(reflect_tbl, cla_tbl, by = join_by(fecha, sitio)) |>
@@ -346,8 +262,7 @@ reflect_cla <- inner_join(reflect_tbl, cla_tbl, by = join_by(fecha, sitio)) |>
 
 ```{r}
 #| echo: false
-#| tbl-cap: Tabla con las mediciones de clorofila-a y las reflectancias de
-#|   superficie asociadas.
+#| tbl-cap: Tabla con las mediciones de clorofila-a y las reflectancias de superficie asociadas.
 #| tbl-cap-location: margin
 #| label: tbl-reflect-cla
 
@@ -358,17 +273,13 @@ gt::gt(head(reflect_cla, 10)) |>
 
 # Correlaciones {#sec-corr}
 
-Se calcula el índice espectral NDVI^[Normilized Difference Vegetation Index] ya
-que está relacionado con la presencia de algas y ha sido utilizado en estudios
-previos para estimar clorofila-a @cosano2020monitoreo.
+Se calcula el índice espectral NDVI^[Normilized Difference Vegetation Index] ya que está relacionado con la presencia de algas y ha sido utilizado en estudios previos para estimar clorofila-a @cosano2020monitoreo.
 
 $$
   NDVI = \frac{B5 - B4}{B5 + B4}
 $$ {#eq-ndvi}
 
-Creo una nueva base de datos que contiene el NDVI. Además, se calcula el
-cociente de bandas `B5/B4`, ya que se ha empleado en estudios similares
-@germanSpacetimeMonitoringWater2021.
+Creo una nueva base de datos que contiene el NDVI. Además, se calcula el cociente de bandas `B5/B4`, ya que se ha empleado en estudios similares @germanSpacetimeMonitoringWater2021.
 
 ```{r}
 d <- reflect_cla |>
@@ -378,9 +289,7 @@ d <- reflect_cla |>
   )
 ```
 
-El coeficiente de correlación lineal ($r$) se obtiene entre `cla` y todas las
-bandas espectrales, el `ndvi` y el cociente `B5/B4`. Esto permite identificar
-aquellas variables que se asocien en mayor grado a la clorofila-a.
+El coeficiente de correlación lineal ($r$) se obtiene entre `cla` y todas las bandas espectrales, el `ndvi` y el cociente `B5/B4`. Esto permite identificar aquellas variables que se asocien en mayor grado a la clorofila-a.
 
 ```{r}
 #| eval: false
@@ -403,8 +312,7 @@ pivot_longer(
 ```{r}
 #| echo: false
 #| eval: true
-#| tbl-cap: Coeficientes de correlación lineal entre clorofila-a y las bandas
-#|   Landsat-8/9.
+#| tbl-cap: Coeficientes de correlación lineal entre clorofila-a y las bandas Landsat-8/9.
 #| tbl-cap-location: margin
 #| label: tbl-corr
 
@@ -431,11 +339,9 @@ Esta tabla permite generar modelos candidatos con mejor criterio.
 
 # División de Datos {#sec-division}
 
-Inicialmente, se dividen los datos en dos grupos: entrenamiento (75%) y
-validación (25%), respetando la distribución de la variable de salida (`cla`).
+Inicialmente, se dividen los datos en dos grupos: entrenamiento (75%) y validación (25%), respetando la distribución de la variable de salida (`cla`).
 
-Dado que esta división es aleatoria, es relevante mantener la reproducibilidad a
-fin de que los resultados no varíen con cada prueba.
+Dado que esta división es aleatoria, es relevante mantener la reproducibilidad a fin de que los resultados no varíen con cada prueba.
 
 ```{r}
 #| warning: false
@@ -449,8 +355,7 @@ datos_split
 
 # Re-muestreo {#sec-remuestreo}
 
-Aplico bootstraping @davisonBootstrapMethodsTheir1997 a los datos de
-entrenamiento, generando 25 nuevos conjuntos de datos que incluyen repeticiones.
+Aplico bootstraping @davisonBootstrapMethodsTheir1997 a los datos de entrenamiento, generando 25 nuevos conjuntos de datos que incluyen repeticiones.
 
 ```{r}
 #| warning: false
@@ -462,13 +367,11 @@ datos_bootstrap
 
 # Construcción de Modelos {#sec-construc-mod}
 
-El desarrollo del modelo requiere definir los especificaciones de los algoritmos
-y las variables de interés y explicativas.
+El desarrollo del modelo requiere definir los especificaciones de los algoritmos y las variables de interés y explicativas.
 
 ## Mecanismos de los modelos {#sec-modelos}
 
-Se especifica la manera en la que se relacionan las variables explicativas con
-el parámetro de interés, indicando el mecanismo de asociación.
+Se especifica la manera en la que se relacionan las variables explicativas con el parámetro de interés, indicando el mecanismo de asociación.
 
 El modelo lineal utilizado para la regresión empleando la función `stats::lm`.
 
@@ -477,13 +380,9 @@ lin_spec <- linear_reg(mode = "regression") |>
   set_engine("lm")
 ```
 
-Modelo *Random Forest* (RF) requiere de parámetros constantes (hiperparámetros,
-HP) que surgen por iteración y no forman parte de los datos. Los valores que
-adoptan los HP afectan el desempeño de los modelos, requiriendo su optimización
-para encontrar el valor más adecuado.
+Modelo *Random Forest* (RF) requiere de parámetros constantes (hiperparámetros, HP) que surgen por iteración y no forman parte de los datos. Los valores que adoptan los HP afectan el desempeño de los modelos, requiriendo su optimización para encontrar el valor más adecuado.
 
-Para el algoritmo RF, se optimiza la cantidad de árboles de decisión (`trees`).
-El modelo RF es creado por `ranger::ranger()` para lograr una regresión.
+Para el algoritmo RF, se optimiza la cantidad de árboles de decisión (`trees`). El modelo RF es creado por `ranger::ranger()` para lograr una regresión.
 
 ```{r}
 rf_spec <- rand_forest(trees = tune()) |>
@@ -493,11 +392,9 @@ rf_spec <- rand_forest(trees = tune()) |>
 
 ## Recetas {#sec-recetas}
 
-Las recetas combinan la `cla`, nuestra variable de interés, con las variables
-explicativas permitiendo agregar etapas de modificación posteriores.
+Las recetas combinan la `cla`, nuestra variable de interés, con las variables explicativas permitiendo agregar etapas de modificación posteriores.
 
-Para los modelos lineales se consideran las siguientes recetas: índice espectral
-`ndvi` y la banda `B5` y el cociente `B5/B4`.
+Para los modelos lineales se consideran las siguientes recetas: índice espectral `ndvi` y la banda `B5` y el cociente `B5/B4`.
 
 ```{r}
 receta_ndvi <- recipe(cla ~ ndvi, data = d)
@@ -505,9 +402,7 @@ receta_b5 <- recipe(cla ~ B5, data = d)
 receta_b5_b4 <- recipe(cla ~ B5_B4, data = d)
 ```
 
-Para los modelos de RF se definen dos recetas: todas las bandas espectrales
-disponibles (de `B1` a `B7`), y una selección de las mismas, conservando
-aquellas más relevantes (@tbl-corr) para el fenómeno de estudio (`B3` y `B5`).
+Para los modelos de RF se definen dos recetas: todas las bandas espectrales disponibles (de `B1` a `B7`), y una selección de las mismas, conservando aquellas más relevantes (@tbl-corr) para el fenómeno de estudio (`B3` y `B5`).
 
 ```{r}
 receta_bandas <- recipe(cla ~ B1 + B2 + B3 + B4 + B5 + B6 + B7, data = d)
@@ -516,9 +411,7 @@ receta_select <- recipe(cla ~ B5 + B3, data = d)
 
 ## Workflow {#sec-workflow}
 
-Unifico todas las recetas y especificaciones de los modelos, indicando las
-combinaciones deseadas, en un `workflow_set`. Inicialmente se encuentra vacío
-previo a la etapa de entrenamiento.
+Unifico todas las recetas y especificaciones de los modelos, indicando las combinaciones deseadas, en un `workflow_set`. Inicialmente se encuentra vacío previo a la etapa de entrenamiento.
 
 ```{r}
 wf <- workflow_set(
@@ -553,21 +446,13 @@ race_ctrl <- finetune::control_race(
 )
 ```
 
-El entrenamiento del `workflow_set` requiere indicar los remuestreos, la
-configuración de la optimización del HP y el mecanismo a emplear.
+El entrenamiento del `workflow_set` requiere indicar los remuestreos, la configuración de la optimización del HP y el mecanismo a emplear.
 
-Para reducir el tiempo de procesamiento dedicado a la optimización de `trees` se
-aplica la técnica de parada anticipada @maronHoeffdingRacesAccelerating, que
-descarta potenciales valores de número de árboles si el desempeño empeora.
+Para reducir el tiempo de procesamiento dedicado a la optimización de `trees` se aplica la técnica de parada anticipada @maronHoeffdingRacesAccelerating, que descarta potenciales valores de número de árboles si el desempeño empeora.
 
-La etapa de entrenamiento es computacionalmente exigente, demorando varios
-minutos en procesar. El tiempo de ejecución dependerá de la cantidad de
-observaciones del conjunto de entrenamiento, del número de remuestreos, del
-mecanismo de optimización de HP, la cantidad de modelos a comparar y las
-características computacionales del sistema.
+La etapa de entrenamiento es computacionalmente exigente, demorando varios minutos en procesar. El tiempo de ejecución dependerá de la cantidad de observaciones del conjunto de entrenamiento, del número de remuestreos, del mecanismo de optimización de HP, la cantidad de modelos a comparar y las características computacionales del sistema.
 
-El objeto resultante `res` contiene cada modelo entrenado, y dada la
-configuración de entrenamiento (`race_ctrl`), cuenta con todos los remuestreos.
+El objeto resultante `res` contiene cada modelo entrenado, y dada la configuración de entrenamiento (`race_ctrl`), cuenta con todos los remuestreos.
 
 ```{r}
 #| echo: false
@@ -598,15 +483,14 @@ res
 
 # Selección del modelo {#sec-seleccion}
 
-Exploro y comparo las métricas de desempeño de todos los modelos propuestos
-entrenados.
+Exploro y comparo las métricas de desempeño de todos los modelos propuestos entrenados.
 
 ```{r}
 #| label: fig-train
 #| fig-cap: Métricas de desemepeño del entrenamiento.
 #| fig-subcap:
 #|   - "RMSE (μg/L) de entrenamiento."
-#|   - "$R^2$ de entrenamiento."
+#|   - "R$^2$ de entrenamiento."
 
 f_entrenamiento <- function(metrica) {
   autoplot(
@@ -631,8 +515,7 @@ f_entrenamiento("rmse")
 f_entrenamiento("rsq")
 ```
 
-El modelo `ndvi_lin` presentó el RMSE más bajo y el R^2 más alto. Se lo elije
-para la etapa de validación.
+El modelo `ndvi_lin` presentó el RMSE más bajo y el R$^2$ más alto. Se lo elije para la etapa de validación.
 
 ```{r}
 #| echo: false
@@ -665,8 +548,7 @@ mejor_res <- res |>
 
 # Validación {#sec-validacion}
 
-Con el mejor modelo seleccionado, finalizo el `workflow` y procedo a la etapa de
-validación con un último ajuste empleando el conjunto de validación.
+Con el mejor modelo seleccionado, finalizo el `workflow` y procedo a la etapa de validación con un último ajuste empleando el conjunto de validación.
 
 ```{r}
 val_res <- res |>
@@ -675,14 +557,12 @@ val_res <- res |>
   last_fit(split = datos_split)
 ```
 
-Internamente, `val_res` contiene las métricas de desempeño de la validación, el
-modelo propiamente dicho, las estimaciones del conjunto de validación, etc.
+Internamente, `val_res` contiene las métricas de desempeño de la validación, el modelo propiamente dicho, las estimaciones del conjunto de validación, etc.
 
 Comparo las estimaciones de `cla` del conjunto de validación.
 
 ```{r}
-#| fig-cap: Comparación entre `cla` medida vs estimada en el conjunto de
-#|   validación.
+#| fig-cap: Comparación entre `cla` medida vs estimada en el conjunto de validación.
 #| fig-cap-location: margin
 #| label: fig-estimado-medido
 
@@ -725,8 +605,7 @@ collect_metrics(val_res) |>
   gt_estilo()
 ```
 
-Verifico que intervalo de confianza (95%) de la pendiente (`cla`) no incluya el
-cero entre las mediciones y las estimaciones.
+Verifico que intervalo de confianza (95%) de la pendiente (`cla`) no incluya el cero entre las mediciones y las estimaciones.
 
 ```{r}
 #| eval: false
@@ -764,17 +643,14 @@ const <- extract_fit_engine(val_res) |>
 ```
 
 $$
-  cla = `{r} const[1]` + `{r} const[2]` \cdot NDVI
+cla = `{r} const[1]` + `{r} const[2]` \cdot NDVI
 $$
 
 # Mapa {#sec-mapa}
 
-Se aplica el modelo desarrollado a un producto satelital para inspeccionar la
-distribución espacial de clorofila-a sobre el Embalse San Roque.
+Se aplica el modelo desarrollado a un producto satelital para inspeccionar la distribución espacial de clorofila-a sobre el Embalse San Roque.
 
-Dado que el algoritmo solo puede aplicarse a píxeles de agua, se calcula el
-índice espectral MNDWI^[Modified Normalized Difference Water Index]
-@xuModificationNormalisedDifference2006, para Landsat-8/9 definido como:
+Dado que el algoritmo solo puede aplicarse a píxeles de agua, se calcula el índice espectral MNDWI^[Modified Normalized Difference Water Index] @xuModificationNormalisedDifference2006, para Landsat-8/9 definido como:
 
 $$
   MNDWI = \frac{B3 - B6}{B3 + B6}
@@ -805,9 +681,7 @@ plot(m, axes = FALSE, col = "dodgerblue", legend = FALSE, box = TRUE)
 north(xy = "topleft", type = 1)
 ```
 
-Específicamente, se aplica el modelo lineal sobre el ráster de agua, obteniendo
-un nuevo ráster con las estimaciones de `cla`. Se remueven valores extremos para
-favorecer la visualización.
+Específicamente, se aplica el modelo lineal sobre el ráster de agua, obteniendo un nuevo ráster con las estimaciones de `cla`. Se remueven valores extremos para favorecer la visualización.
 
 ```{r}
 cla_pred <- terra::predict(agua_ndvi, extract_fit_engine(val_res))
@@ -833,19 +707,14 @@ ggplot() +
   labs(title = r2_fecha, fill = "Clorofila-a\n(μg/L)") +
   theme_minimal() +
   theme_sub_legend(key.height = unit(45, "pt")) +
-  theme_sub_panel(
-    background = element_rect(fill = "grey95"),
-    grid.major = element_line(linetype = 2, color = "grey80", linewidth = .3)
-  ) +
+  theme_sub_panel(background = element_blank()) +
   theme_sub_plot(background = element_blank()) +
   theme_sub_axis_left(text = element_text(angle = 90, hjust = .5))
 ```
 
 # Explicabilidad {#sec-explicabilidad}
 
-Retomando los modelos RF, es posible identificar las variables que más aportan
-en el algoritmo. Esto permite explorar la explicabilidad y así tratar de
-entender su funcionamiento interno.
+Retomando los modelos RF, es posible identificar las variables que más aportan en el algoritmo. Esto permite explorar la explicabilidad y así tratar de entender su funcionamiento interno.
 
 Se finaliza el modelo RF con mejor desempeño (`select_rf`) y se valida.
 
@@ -860,17 +729,11 @@ rf_val_res <- res |>
   last_fit(split = datos_split)
 ```
 
-Para comprender el efecto que posee cada banda espectral individual (`B3` y
-`B5`) sobre el algoritmo, se emplea la técnica *importancia global de variables*
-@biecekExplanatoryModelAnalysis2021a. La misma implica eliminar, una a una, cada
-variable explicativa y evaluar el efecto en el desempeño.
+Para comprender el efecto que posee cada banda espectral individual (`B3` y `B5`) sobre el algoritmo, se emplea la técnica *importancia global de variables* @biecekExplanatoryModelAnalysis2021a. La misma implica eliminar, una a una, cada variable explicativa y evaluar el efecto en el desempeño.
 
-Se espera que si una variable aporta considerablemente en la regresión del
-modelo, su ausencia empobrecerá su desempeño. Si al eliminar una variable, el
-algoritmo se altera mínimamente, entonces su aporte es menor.
+Se espera que si una variable aporta considerablemente en la regresión del modelo, su ausencia empobrecerá su desempeño. Si al eliminar una variable, el algoritmo se altera mínimamente, entonces su aporte es menor.
 
-Identifico las variables de interés, creo un `explainer` y calculo la función de
-pérdida que identifica el aporte dado por cada banda espectral.
+Identifico las variables de interés, creo un `explainer` y calculo la función de pérdida que identifica el aporte dado por cada banda espectral.
 
 ```{r}
 #| warning: false
@@ -913,22 +776,15 @@ ggplot(vip_df, aes(dropout_loss, variable)) +
   theme_sub_plot(background = element_blank())
 ```
 
-Dentro del modelo RF de dos bandas, la banda espectral `B5` posee una mayor
-contribución que la banda `B3`.
+Dentro del modelo RF de dos bandas, la banda espectral `B5` posee una mayor contribución que la banda `B3`.
 
 # Conclusión {#sec-conclusion .unnumbered}
 
-Se logró la modelización de clorofila-a en el Embalse San Roque. La combinación
-de reflectancias de superficie provenientes de productos Landsat-8/9 y
-mediciones in situ de clorofila-a permitieron generar una base de datos para el
-desarrollo de un algoritmo.
+Se logró la modelización de clorofila-a en el Embalse San Roque. La combinación de reflectancias de superficie provenientes de productos Landsat-8/9 y mediciones in situ de clorofila-a permitieron generar una base de datos para el desarrollo de un algoritmo.
 
-Diferentes modelos candidatos fueron propuestos, incluyendo expresiones lineales
-simples y de aprendizaje automático mediante random forest. El mejor modelo
-resultó una ecuación lineal con NDVI como variable explicativa.
+Diferentes modelos candidatos fueron propuestos, incluyendo expresiones lineales simples y de aprendizaje automático mediante random forest. El mejor modelo resultó una ecuación lineal con NDVI como variable explicativa.
 
-Al aplicar el modelo desarrollado sobre un recorte del Embalse San Roque se
-obtuvo un mapa de distribución de clorofila-a.
+Al aplicar el modelo desarrollado sobre un recorte del Embalse San Roque se obtuvo un mapa de distribución de clorofila-a.
 
 # Referencias {#sec-referencias .unnumbered}
 
