@@ -87,11 +87,11 @@ banda_rango <- wvl |>
   range()
 banda_rango
 
-r_vnir <- r[[banda_rango[1]:banda_rango[2]]]
-reflect_vnir <- terra::extract(r_vnir, p)
+r_rango <- r[[banda_rango[1]:banda_rango[2]]]
+reflect_vnir <- terra::extract(r_rango, p)
 rownames(reflect_vnir) <- p$puntos
 
-lago_sam_ang <- RStoolbox::sam(r_vnir, reflect_vnir, angles = TRUE)
+lago_sam_ang <- RStoolbox::sam(r_rango, reflect_vnir, angles = TRUE)
 
 plot(
   lago_sam_ang,
@@ -102,7 +102,7 @@ plot(
   col = rev(viridis::magma(500))
 )
 
-lago_sam_clas <- RStoolbox::sam(r_vnir, reflect_vnir, angles = FALSE)
+lago_sam_clas <- RStoolbox::sam(r_rango, reflect_vnir, angles = FALSE)
 
 ggplot() +
   geom_spatraster(data = lago_sam_clas) +
@@ -146,8 +146,8 @@ m <- fillHoles(m)
 plot(m, col = "dodgerblue", axes = FALSE, box = TRUE, legend = FALSE)
 north(xy = "topleft")
 
-agua_pca <- m * r_vnir
-r_pca <- RStoolbox::rasterPCA(agua_pca, nComp = 3)
+agua_pca <- m * r_rango
+r_pca <- RStoolbox::rasterPCA(agua_pca, nComp = 3, spca = TRUE)
 
 plot(
   r_pca$map,
@@ -161,33 +161,29 @@ plot(
 plotRGB(stretch(r_pca$map), stretch = "lin", colNA = "transparent")
 north(xy = "topleft")
 
-r_pca$model$sdev |>
-  as_tibble() |>
-  mutate(pca = paste0("PC", row_number())) |>
-  mutate(pca = fct_inorder(pca)) |>
-  mutate(aporte = value / sum(value)) |>
+acumulado_pca <- factoextra::get_eigenvalue(r_pca$model) |>
+  as_tibble(rownames = "dim") |>
   slice_head(n = 3) |>
-  mutate(acumulado = cumsum(aporte)) |>
-  mutate(acumulado_label = paste0(round(acumulado * 100, 1), "%")) |>
-  ggplot(aes(pca, aporte, fill = pca)) +
-  geom_col() +
+  select(dim, var = variance.percent, acumulado = cumulative.variance.percent)
+acumulado_pca
+
+acumulado_pca |>
+  mutate(acumulado_label = paste0(round(acumulado, 1), "%")) |>
+  ggplot(aes(x = dim, fill = dim)) +
+  geom_col(aes(y = var)) +
   geom_line(aes(y = acumulado, group = 1)) +
   geom_point(
-    aes(y = acumulado, fill = pca),
+    aes(y = acumulado, fill = dim),
     shape = 21,
     size = 3,
     stroke = 1,
     color = "white"
   ) +
   geom_text(aes(y = acumulado, label = acumulado_label), vjust = -1) +
-  scale_y_continuous(
-    labels = scales::label_percent(),
-    breaks = scales::breaks_width(.1),
-    # limits = c(0, .8)
-  ) +
+  scale_y_continuous(breaks = scales::breaks_width(10)) +
   scale_fill_brewer(palette = "Dark2", guide = guide_none()) +
-  coord_cartesian(clip = "off") +
-  labs(x = NULL, y = "Aporte") +
+  coord_cartesian(clip = "off", ylim = c(0, 100)) +
+  labs(x = NULL, y = "Aporte (%)") +
   theme_bw() +
   theme_sub_axis(text = element_text(color = "black")) +
   theme_sub_plot(background = element_blank()) +
