@@ -19,4 +19,10 @@ La instalación de los paquetes está organizada por [`renv`](https://rstudio.gi
 renv::restore()
 ```
 
-Asimismo, los scripts se encuentran disponibles en una notebook de [Google Colab](https://colab.research.google.com/drive/1yS79LNB4eCzfhuDCTfH5m-2peRXGGdY8).
+Hay disponibles dos scripts (`clorofila.R` y `prisma.R`) para quienes deseen seguir la clase, ejecutando paso a paso los comandos. Asimismo, los scripts también se encuentran disponibles como notebooks en Google Colab ([clorofila-a](https://colab.research.google.com/drive/1yS79LNB4eCzfhuDCTfH5m-2peRXGGdY8) y [PRISMA](https://colab.research.google.com/drive/1d8UzcB0-F6MLvQQDFCriV_T8c5nOBFFS)).
+
+## Integrantes
+
+- Dra. Anabella Ferral
+- Dra. Rocío Guido
+- Mgtr. Víctor Gauto
