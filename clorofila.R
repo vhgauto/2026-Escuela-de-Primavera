@@ -255,10 +255,6 @@ ggplot() +
   labs(title = r2_fecha, fill = "Clorofila-a\n(μg/L)") +
   theme_minimal() +
   theme_sub_legend(key.height = unit(45, "pt")) +
-  theme_sub_panel(
-    background = element_rect(fill = "grey95"),
-    grid.major = element_line(linetype = 2, color = "grey80", linewidth = .3)
-  ) +
   theme_sub_plot(background = element_blank()) +
   theme_sub_axis_left(text = element_text(angle = 90, hjust = .5))
 
