@@ -803,3 +803,25 @@ read.csv("versiones.csv") |>
   gt_estilo()
 ```
 :::
+
+:::: {.column-screen-inset}
+
+::: {layout-nrow="1" layout-valign="center" layout-align="center"}
+
+![](extras/oasis.png){width=150}
+
+![](extras/grss.png){width=150}
+
+![](extras/autoridad_de_cuencas.png){width=150}
+
+![](extras/geoaquawatch.png){width=150}
+
+![](extras/gulich.png){width=150}
+
+![](extras/unc.png){width=150}
+
+![](extras/conae.png){width=150}
+
+:::
+
+::::
