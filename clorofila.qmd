@@ -505,9 +505,8 @@ f_entrenamiento <- function(metrica) {
       vjust = -.3,
       size = 5
     ) +
-    coord_cartesian(clip = "off") +
     theme_bw() +
-    theme(aspect.ratio = 1, legend.position = "none") +
+    theme(legend.position = "none") +
     theme_sub_panel(background = element_blank()) +
     theme_sub_plot(background = element_blank())
 }
@@ -727,6 +726,20 @@ rf_val_res <- res |>
   extract_workflow("select_rf") |>
   finalize_workflow(rf_mejor_res) |>
   last_fit(split = datos_split)
+```
+
+Es posible conocer la cantidad de árboles óptima para este modelo RF.
+
+```{r}
+#| eval: false
+rf_mejor_res
+```
+
+```{r}
+#| echo: false
+
+gt::gt(rf_mejor_res) |>
+  gt_estilo()
 ```
 
 Para comprender el efecto que posee cada banda espectral individual (`B3` y `B5`) sobre el algoritmo, se emplea la técnica *importancia global de variables* @biecekExplanatoryModelAnalysis2021a. La misma implica eliminar, una a una, cada variable explicativa y evaluar el efecto en el desempeño.
