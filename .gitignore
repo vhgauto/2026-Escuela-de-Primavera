@@ -17,6 +17,8 @@ tp_prisma/*.R
 *.docx
 *.pdf
 *.html
+!clorofila.html
+!prisma.html
 *.pptx
 *.X
 .Rproj.user
